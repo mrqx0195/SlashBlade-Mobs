@@ -1,0 +1,12 @@
+{
+  "values": [
+    "slashblade_mobs:slash_zombie",
+    "slashblade_mobs:slash_husk",
+    "slashblade_mobs:slash_drowned",
+    "slashblade_mobs:slash_skeleton",
+    "slashblade_mobs:slash_stray",
+    "slashblade_mobs:slash_wither_skeleton",
+    "slashblade_mobs:slash_villager",
+    "slashblade_mobs:slash_illager"
+  ]
+}

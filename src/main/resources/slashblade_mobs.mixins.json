@@ -1,0 +1,15 @@
+{
+  "compatibilityLevel": "JAVA_17",
+  "minVersion": "0.8",
+  "mixins": [
+    "AccessorVillager",
+    "MixinRaid",
+    "MixinSinglePoolElement",
+    "MixinVillagerGoalPackages"
+  ],
+  "package": "net.mrqx.slashblade.mobs.mixin",
+  "refmap": "slashblade_mobs.refmap.json",
+  "required": true,
+  "client": [
+  ]
+}

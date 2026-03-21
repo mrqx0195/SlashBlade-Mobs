@@ -1,0 +1,18 @@
+{
+  "entity.slashblade_mobs.slash_drowned": "Slash Drowned",
+  "entity.slashblade_mobs.slash_husk": "Slash Husk",
+  "entity.slashblade_mobs.slash_illager": "Slash Illager",
+  "entity.slashblade_mobs.slash_skeleton": "Slash Skeleton",
+  "entity.slashblade_mobs.slash_stray": "Slash Stray",
+  "entity.slashblade_mobs.slash_villager": "Slash Villager",
+  "entity.slashblade_mobs.slash_wither_skeleton": "Slash Wither Skeleton",
+  "entity.slashblade_mobs.slash_zombie": "Slash Zombie",
+  "item.slashblade_mobs.slash_drowned_spawn_egg": "Slash Drowned Spawn Egg",
+  "item.slashblade_mobs.slash_husk_spawn_egg": "Slash Husk Spawn Egg",
+  "item.slashblade_mobs.slash_illager_spawn_egg": "Slash Illager Spawn Egg",
+  "item.slashblade_mobs.slash_skeleton_spawn_egg": "Slash Skeleton Spawn Egg",
+  "item.slashblade_mobs.slash_stray_spawn_egg": "Slash Stray Spawn Egg",
+  "item.slashblade_mobs.slash_villager_spawn_egg": "Slash Villager Spawn Egg",
+  "item.slashblade_mobs.slash_wither_skeleton_spawn_egg": "Slash Wither Skeleton Spawn Egg",
+  "item.slashblade_mobs.slash_zombie_spawn_egg": "Slash Zombie Spawn Egg"
+}
