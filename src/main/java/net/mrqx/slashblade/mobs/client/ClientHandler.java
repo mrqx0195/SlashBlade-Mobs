@@ -13,7 +13,7 @@ import net.mrqx.slashblade.mobs.client.renderer.*;
 import net.mrqx.slashblade.mobs.registy.SlashMobsEntities;
 
 @OnlyIn(Dist.CLIENT)
-@Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.MOD)
+@Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
 public class ClientHandler {
     public static final ModelLayerLocation SLASH_VILLAGER = new ModelLayerLocation(SlashBladeMobs.prefix("slash_villager"), "main");
 

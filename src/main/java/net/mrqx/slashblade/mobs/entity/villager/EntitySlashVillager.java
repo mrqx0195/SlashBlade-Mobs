@@ -80,7 +80,10 @@ import net.mrqx.slashblade.mobs.registy.SlashMobsVillagerProfessions;
 import net.mrqx.slashblade.mobs.utils.SlashMobsUtils;
 
 import javax.annotation.Nullable;
-import java.util.*;
+import java.util.List;
+import java.util.Objects;
+import java.util.Set;
+import java.util.UUID;
 import java.util.function.BiFunction;
 
 @SuppressWarnings("DuplicatedCode")
@@ -607,7 +610,7 @@ public class EntitySlashVillager extends AbstractVillager implements ISlashBlade
                 targetList.add(target);
             }
         }
-        return targetList.stream().distinct().collect(ArrayList::new, ArrayList::add, ArrayList::addAll);
+        return targetList;
     }
 
     @Override

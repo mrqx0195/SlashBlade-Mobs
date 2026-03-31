@@ -172,7 +172,8 @@ var generateModMetadata = tasks.register("generateModMetadata", ProcessResources
             slash_blade_version_range          : slash_blade_version_range,
             mrqx_slash_blade_core_version      : mrqx_slash_blade_core_version,
             mrqx_slash_blade_core_version_range: mrqx_slash_blade_core_version_range,
-            player_animation_version           : player_animation_version
+            player_animation_version           : player_animation_version,
+            player_animation_version_range     : player_animation_version_range
     ]
     inputs.properties replaceProperties
     expand replaceProperties
