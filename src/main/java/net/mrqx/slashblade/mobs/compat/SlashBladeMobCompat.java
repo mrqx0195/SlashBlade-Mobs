@@ -11,21 +11,21 @@ import java.util.List;
 
 public class SlashBladeMobCompat {
     private static final SlashBladeMobCompat INSTANCE = new SlashBladeMobCompat();
-
+    
     public static SlashBladeMobCompat getInstance() {
         return INSTANCE;
     }
-
+    
     public final boolean hasGuardVillagers;
-
+    
     private SlashBladeMobCompat() {
         this.hasGuardVillagers = LoaderUtil.isClassAvailable("tallestegg.guardvillagers.GuardVillagers");
     }
-
+    
     public static class Factories {
         private static final List<Class<?>> SLASH_VILLAGER_IGNORES = new ArrayList<>();
         private static final List<Class<?>> SLASH_ILLAGER_IGNORES = new ArrayList<>();
-
+        
         public static List<Class<?>> getSlashVillagerIgnores() {
             if (SLASH_VILLAGER_IGNORES.isEmpty()) {
                 List<Class<?>> list = new ArrayList<>();
@@ -38,7 +38,7 @@ public class SlashBladeMobCompat {
             }
             return SLASH_VILLAGER_IGNORES;
         }
-
+        
         public static List<Class<?>> getSlashIllagerIgnores() {
             if (SLASH_ILLAGER_IGNORES.isEmpty()) {
                 List<Class<?>> list = new ArrayList<>();

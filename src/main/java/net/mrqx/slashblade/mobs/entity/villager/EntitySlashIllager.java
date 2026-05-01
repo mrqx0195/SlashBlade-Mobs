@@ -100,7 +100,7 @@ public class EntitySlashIllager extends AbstractIllager implements ISlashBladeEn
     @Nullable
     private final SlashVillagerFakePlayer fakePlayer;
     private final SlashVillagerFakeBladeStand bladeStand;
-
+    
     public EntitySlashIllager(EntityType<? extends EntitySlashIllager> entityType, Level level) {
         super(entityType, level);
         this.xpReward *= 2;
@@ -115,7 +115,7 @@ public class EntitySlashIllager extends AbstractIllager implements ISlashBladeEn
         bladeStand = new SlashVillagerFakeBladeStand(SlashBlade.RegistryEvents.BladeStand, level);
         this.xpReward *= 2;
     }
-
+    
     @Override
     protected void registerGoals() {
         super.registerGoals();
@@ -135,30 +135,30 @@ public class EntitySlashIllager extends AbstractIllager implements ISlashBladeEn
         this.goalSelector.addGoal(9, new LookAtPlayerGoal(this, Player.class, 3.0F, 1.0F));
         this.goalSelector.addGoal(10, new LookAtPlayerGoal(this, Mob.class, 8.0F));
     }
-
+    
     public static AttributeSupplier.Builder createAttributes() {
         return Monster.createMonsterAttributes()
-                .add(Attributes.MOVEMENT_SPEED, 0.5)
-                .add(Attributes.MAX_HEALTH, 20.0)
-                .add(Attributes.ATTACK_DAMAGE, 1.0)
-                .add(Attributes.ARMOR, 5.0)
-                .add(Attributes.FOLLOW_RANGE, 32.0);
+            .add(Attributes.MOVEMENT_SPEED, 0.5)
+            .add(Attributes.MAX_HEALTH, 20.0)
+            .add(Attributes.ATTACK_DAMAGE, 1.0)
+            .add(Attributes.ARMOR, 5.0)
+            .add(Attributes.FOLLOW_RANGE, 32.0);
     }
-
+    
     @Override
     protected void defineSynchedData() {
         super.defineSynchedData();
         this.entityData.define(DATA_VILLAGER_DATA, new VillagerData(VillagerType.PLAINS, SlashMobsVillagerProfessions.SLASHBLADE_SAMURAI_A.get(), 1));
     }
-
+    
     @Override
     public void addAdditionalSaveData(CompoundTag compound) {
         super.addAdditionalSaveData(compound);
         VillagerData.CODEC.encodeStart(NbtOps.INSTANCE, this.getVillagerData()).resultOrPartial(SlashBladeMobs.LOGGER::error)
-                .ifPresent(tag -> compound.put("VillagerData", tag));
+            .ifPresent(tag -> compound.put("VillagerData", tag));
         compound.putInt("Xp", this.villagerXp);
     }
-
+    
     @Override
     public void readAdditionalSaveData(CompoundTag compound) {
         super.readAdditionalSaveData(compound);
@@ -176,22 +176,22 @@ public class EntitySlashIllager extends AbstractIllager implements ISlashBladeEn
             this.mirageBladeGoal.refreshProfessionSettings(this.getVillagerData());
         }
     }
-
+    
     @Override
     protected SoundEvent getAmbientSound() {
         return SoundEvents.PILLAGER_AMBIENT;
     }
-
+    
     @Override
     protected SoundEvent getDeathSound() {
         return SoundEvents.PILLAGER_DEATH;
     }
-
+    
     @Override
     protected SoundEvent getHurtSound(DamageSource damageSource) {
         return SoundEvents.PILLAGER_HURT;
     }
-
+    
     @Override
     @Nullable
     public SpawnGroupData finalizeSpawn(ServerLevelAccessor level, DifficultyInstance difficulty, MobSpawnType reason, @Nullable SpawnGroupData spawnData, @Nullable CompoundTag dataTag) {
@@ -209,7 +209,7 @@ public class EntitySlashIllager extends AbstractIllager implements ISlashBladeEn
         this.populateDefaultEquipmentEnchantments(randomsource, difficulty);
         return spawngroupdata;
     }
-
+    
     @Override
     protected void populateDefaultEquipmentSlots(RandomSource random, DifficultyInstance difficulty) {
         if (this.getCurrentRaid() == null) {
@@ -225,7 +225,7 @@ public class EntitySlashIllager extends AbstractIllager implements ISlashBladeEn
         this.setItemSlot(EquipmentSlot.MAINHAND, EntitySlashVillager.getDefaultBladeForVillagerLevel(bladeRegistry, this.getVillagerData().getLevel()));
         this.refreshBlade();
     }
-
+    
     public void refreshBlade() {
         Registry<SlashBladeDefinition> bladeRegistry = SlashBlade.getSlashBladeDefinitionRegistry(this.level());
         ItemStack newBlade = EntitySlashVillager.getDefaultBladeForVillagerLevel(bladeRegistry, this.getVillagerData().getLevel());
@@ -244,7 +244,7 @@ public class EntitySlashIllager extends AbstractIllager implements ISlashBladeEn
             this.mirageBladeGoal.refreshProfessionSettings(this.getVillagerData());
         }
     }
-
+    
     @Override
     public void applyRaidBuffs(int wave, boolean unusedFalse) {
         ItemStack stack = new ItemStack(SlashBladeItems.SLASHBLADE.get());
@@ -260,12 +260,12 @@ public class EntitySlashIllager extends AbstractIllager implements ISlashBladeEn
         this.setVillagerData(this.getVillagerData().setLevel(Math.min(wave - 2, 5)));
         this.refreshBlade();
     }
-
+    
     @Override
     public SoundEvent getCelebrateSound() {
         return SoundEvents.PILLAGER_CELEBRATE;
     }
-
+    
     @Override
     public boolean isAlliedTo(Entity entity) {
         if (super.isAlliedTo(entity)) {
@@ -276,7 +276,7 @@ public class EntitySlashIllager extends AbstractIllager implements ISlashBladeEn
             return false;
         }
     }
-
+    
     @Override
     public void tick() {
         super.tick();
@@ -288,19 +288,19 @@ public class EntitySlashIllager extends AbstractIllager implements ISlashBladeEn
                 }
             }
         }
-
+        
         AttributeInstance armorAttribute = this.getAttribute(Attributes.ARMOR);
         if (armorAttribute != null) {
             armorAttribute.removeModifier(EntitySlashVillager.SLASH_VILLAGER_ARMOR_MODIFIER);
             armorAttribute.addPermanentModifier(new AttributeModifier(EntitySlashVillager.SLASH_VILLAGER_ARMOR_MODIFIER,
-                    "SlashVillager Armor Modifier", this.getVillagerData().getLevel() * 3, AttributeModifier.Operation.ADDITION));
+                "SlashVillager Armor Modifier", this.getVillagerData().getLevel() * 3, AttributeModifier.Operation.ADDITION));
         }
-
+        
         if (this.getItemInHand(InteractionHand.MAIN_HAND).getItem() instanceof ItemSlashBlade) {
             this.getItemInHand(InteractionHand.MAIN_HAND).inventoryTick(this.level(), this, 0, true);
         }
-
-
+        
+        
         long cooldown = JustSlashArtManager.getJustCooldown(this);
         if (cooldown > 0) {
             SlashVillagerProfessionSettings professionSettings = this.getSlashVillagerProfessionSettings();
@@ -313,7 +313,7 @@ public class EntitySlashIllager extends AbstractIllager implements ISlashBladeEn
             }
         }
     }
-
+    
     @Override
     protected void customServerAiStep() {
         super.customServerAiStep();
@@ -323,7 +323,7 @@ public class EntitySlashIllager extends AbstractIllager implements ISlashBladeEn
             SlashVillagerProfessionSettings professionSettings = this.getSlashVillagerProfessionSettings();
             if (professionSettings != null) {
                 SlashBladeMovementUtils.tickSlashBladeTrick(this, this.getTarget(),
-                        professionSettings.canAirTrick, professionSettings.canTrickDown, professionSettings.canTrickDodge, professionSettings.powerful);
+                    professionSettings.canAirTrick, professionSettings.canTrickDown, professionSettings.canTrickDodge, professionSettings.powerful);
             }
         }
         MinecraftServer server = this.level().getServer();
@@ -342,16 +342,16 @@ public class EntitySlashIllager extends AbstractIllager implements ISlashBladeEn
             }
         }
     }
-
+    
     @Override
     public boolean wantsToPickUp(ItemStack stack) {
         return stack.is(SlashBladeItemTags.PROUD_SOULS) ||
-                stack.is(SlashBladeItemTags.CAN_CHANGE_SA) ||
-                stack.is(SlashBladeItemTags.CAN_CHANGE_SE) ||
-                stack.is(SlashBladeItemTags.CAN_COPY_SA) ||
-                stack.is(SlashBladeItemTags.CAN_COPY_SE);
+            stack.is(SlashBladeItemTags.CAN_CHANGE_SA) ||
+            stack.is(SlashBladeItemTags.CAN_CHANGE_SE) ||
+            stack.is(SlashBladeItemTags.CAN_COPY_SA) ||
+            stack.is(SlashBladeItemTags.CAN_COPY_SE);
     }
-
+    
     @Override
     protected InteractionResult mobInteract(Player player, InteractionHand hand) {
         if (this.wantsToPickUp(player.getItemInHand(hand))) {
@@ -360,20 +360,20 @@ public class EntitySlashIllager extends AbstractIllager implements ISlashBladeEn
         }
         return InteractionResult.PASS;
     }
-
+    
     @Override
     public void pickUpItem(ItemEntity itemEntity) {
         this.onPickupProudSoul(itemEntity.getItem());
     }
-
+    
     @Override
     public boolean killedEntity(ServerLevel level, LivingEntity entity) {
         ItemStack stack = this.getMainHandItem();
         if (!stack.isEmpty()) {
             if (stack.getCapability(ItemSlashBlade.BLADESTATE).isPresent()) {
                 IConcentrationRank.ConcentrationRanks rankBonus = this.getCapability(ConcentrationRankCapabilityProvider.RANK_POINT)
-                        .map((rp) -> rp.getRank(this.level().getGameTime()))
-                        .orElse(IConcentrationRank.ConcentrationRanks.NONE);
+                    .map((rp) -> rp.getRank(this.level().getGameTime()))
+                    .orElse(IConcentrationRank.ConcentrationRanks.NONE);
                 int souls = (int) Math.floor(entity.getExperienceReward() * (1 + rankBonus.level * 0.1));
                 stack.getCapability(ItemSlashBlade.BLADESTATE).ifPresent((state) -> {
                     SlashBladeEvent.AddProudSoulEvent soulEvent = new SlashBladeEvent.AddProudSoulEvent(stack, state, Math.min(SlashBladeConfig.MAX_PROUD_SOUL_GOT.get(), souls));
@@ -390,31 +390,31 @@ public class EntitySlashIllager extends AbstractIllager implements ISlashBladeEn
         }
         return true;
     }
-
+    
     public void onPickupProudSoul(ItemStack item) {
         ItemStack blade = this.getMainHandItem();
         if (this.level() instanceof ServerLevel && this.fakePlayer != null) {
             ItemStack copy = item.copy();
             AnvilUpdateEvent updateEvent = new AnvilUpdateEvent(blade, copy, blade.getHoverName().toString(),
-                    blade.getBaseRepairCost() + (copy.isEmpty() ? 0 : copy.getBaseRepairCost()), this.fakePlayer);
+                blade.getBaseRepairCost() + (copy.isEmpty() ? 0 : copy.getBaseRepairCost()), this.fakePlayer);
             if (!MinecraftForge.EVENT_BUS.post(updateEvent) && !updateEvent.getOutput().isEmpty()) {
                 ItemStack output = updateEvent.getOutput();
                 copy.setCount(copy.getCount() - updateEvent.getMaterialCost());
                 int proudSoulCount = Math.max(output.getCapability(ItemSlashBlade.BLADESTATE).map(ISlashBladeState::getProudSoulCount).orElse(0)
-                        - blade.getCapability(ItemSlashBlade.BLADESTATE).map(ISlashBladeState::getProudSoulCount).orElse(0), 0);
+                    - blade.getCapability(ItemSlashBlade.BLADESTATE).map(ISlashBladeState::getProudSoulCount).orElse(0), 0);
                 this.setItemInHand(InteractionHand.MAIN_HAND, output);
                 AnvilRepairEvent repairEvent = new AnvilRepairEvent(this.fakePlayer, blade, copy, output);
                 MinecraftForge.EVENT_BUS.post(repairEvent);
                 this.rewardXp(proudSoulCount / 100);
             }
-
+            
             ItemStack blade1 = this.getMainHandItem();
             ItemStack copy1 = item.copy();
             this.fakePlayer.setItemInHand(InteractionHand.MAIN_HAND, copy1);
             this.bladeStand.setItem(blade1.copy());
             blade1.getCapability(ItemSlashBlade.BLADESTATE).ifPresent(state -> {
                 SlashBladeEvent.BladeStandAttackEvent attackEvent = new SlashBladeEvent.BladeStandAttackEvent(blade1, state, this.bladeStand,
-                        this.level().damageSources().playerAttack(this.fakePlayer));
+                    this.level().damageSources().playerAttack(this.fakePlayer));
                 MinecraftForge.EVENT_BUS.post(attackEvent);
                 this.setItemInHand(InteractionHand.MAIN_HAND, attackEvent.getBlade());
             });
@@ -423,7 +423,7 @@ public class EntitySlashIllager extends AbstractIllager implements ISlashBladeEn
             this.fakePlayer.setItemInHand(InteractionHand.MAIN_HAND, ItemStack.EMPTY);
         }
     }
-
+    
     public void rewardXp(int villagerXp) {
         int i = 3 + this.random.nextInt(4);
         this.villagerXp += villagerXp;
@@ -434,15 +434,15 @@ public class EntitySlashIllager extends AbstractIllager implements ISlashBladeEn
         }
         this.level().addFreshEntity(new ExperienceOrb(this.level(), this.getX(), this.getY() + 0.5D, this.getZ(), i));
     }
-
+    
     @Override
     public double getMeleeAttackRangeSqr(LivingEntity entity) {
         AtomicDouble attackDistance = new AtomicDouble(super.getMeleeAttackRangeSqr(entity));
         this.getMainHandItem().getCapability(ItemSlashBlade.BLADESTATE).ifPresent(state ->
-                attackDistance.set(TargetSelector.getResolvedReach(this)));
+            attackDistance.set(TargetSelector.getResolvedReach(this)));
         return attackDistance.get() * attackDistance.get();
     }
-
+    
     @Override
     public void setCurrentAnimation(@Nullable VanillaConvertedVmdAnimation currentAnimation) {
         this.currentAnimation = currentAnimation;
@@ -450,12 +450,12 @@ public class EntitySlashIllager extends AbstractIllager implements ISlashBladeEn
             this.currentAnimation.play();
         }
     }
-
+    
     @Override
     public @Nullable VanillaConvertedVmdAnimation getCurrentAnimation() {
         return this.currentAnimation;
     }
-
+    
     @Override
     public boolean canProgressCombo(LivingEntity target, ResourceLocation current, ResourceLocation next) {
         SlashVillagerProfessionSettings professionSettings = this.getSlashVillagerProfessionSettings();
@@ -469,7 +469,7 @@ public class EntitySlashIllager extends AbstractIllager implements ISlashBladeEn
             return this.canUseCombo(next);
         }
     }
-
+    
     @Override
     public boolean canUseCombo(ResourceLocation combo) {
         SlashVillagerProfessionSettings professionSettings = this.getSlashVillagerProfessionSettings();
@@ -483,18 +483,18 @@ public class EntitySlashIllager extends AbstractIllager implements ISlashBladeEn
             return true;
         }
     }
-
+    
     @Override
     public Set<Class<? extends Entity>> getAttackableEntities() {
         return Set.of(LivingEntity.class);
     }
-
+    
     @Override
     public List<Entity> processTargetList(Level world, LivingEntity attacker, AABB aabb, double reach, List<Entity> originalTargetList) {
         List<Entity> targetList = ISlashBladeEntity.super.processTargetList(world, attacker, aabb, reach, originalTargetList);
-
+        
         targetList.removeIf(entity -> SlashBladeMobCompat.Factories.getSlashIllagerIgnores().stream().anyMatch(clazz -> clazz.isInstance(entity)));
-
+        
         attacker.getMainHandItem().getCapability(ItemSlashBlade.BLADESTATE).ifPresent(state -> {
             Entity target = state.getTargetEntity(world);
             if (target != null) {
@@ -509,7 +509,7 @@ public class EntitySlashIllager extends AbstractIllager implements ISlashBladeEn
         }
         return targetList;
     }
-
+    
     @Override
     public boolean useUpperSlashJump() {
         SlashVillagerProfessionSettings professionSettings = this.getSlashVillagerProfessionSettings();
@@ -519,49 +519,49 @@ public class EntitySlashIllager extends AbstractIllager implements ISlashBladeEn
             return ISlashBladeEntity.super.useUpperSlashJump();
         }
     }
-
+    
     @Nullable
     public SlashVillagerProfessionSettings getSlashVillagerProfessionSettings() {
         return SlashVillagerProfessionSettings.getSettings(this.getVillagerData().getProfession(), this.getVillagerData().getLevel());
     }
-
+    
     @Override
     public VillagerData getVillagerData() {
         return this.entityData.get(DATA_VILLAGER_DATA);
     }
-
-
+    
+    
     @Override
     public void setVillagerData(VillagerData data) {
         this.entityData.set(DATA_VILLAGER_DATA, data);
     }
-
+    
     @Override
     public void performRangedAttack(LivingEntity target, float velocity) {
     }
-
+    
     @Override
     public AbstractIllager.IllagerArmPose getArmPose() {
         return IllagerArmPose.NEUTRAL;
     }
-
+    
     public class SlashVillagerFakePlayer extends FakePlayer {
         public SlashVillagerFakePlayer(EntitySlashIllager slashVillager, ServerLevel level) {
             super(level, new GameProfile(UUID.randomUUID(), slashVillager.stringUUID));
         }
-
+        
         @Override
         public void tick() {
             super.tick();
             this.moveTo(EntitySlashIllager.this.getX(), EntitySlashIllager.this.getY(), EntitySlashIllager.this.getZ(), EntitySlashIllager.this.getYRot(), EntitySlashIllager.this.getXRot());
         }
     }
-
+    
     public class SlashVillagerFakeBladeStand extends BladeStandEntity {
         public SlashVillagerFakeBladeStand(EntityType<? extends BladeStandEntity> entityType, Level level) {
             super(entityType, level);
         }
-
+        
         @Override
         public void tick() {
             super.tick();

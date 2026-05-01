@@ -19,17 +19,17 @@ import net.mrqx.slashblade.mobs.entity.EntitySlashDrowned;
 @OnlyIn(Dist.CLIENT)
 public class RendererSlashDrowned extends HumanoidMobRenderer<EntitySlashDrowned, ModelSlashDrowned<EntitySlashDrowned>> {
     private static final ResourceLocation DROWNED_LOCATION = ResourceLocation.parse("textures/entity/zombie/drowned.png");
-
+    
     public RendererSlashDrowned(EntityRendererProvider.Context context) {
         super(context, new ModelSlashDrowned<>(context.bakeLayer(ModelLayers.DROWNED)), 0.5F);
         this.addLayer(new LayerSlashEntityArmor<>(this,
-                new ModelSlashDrowned<>(context.bakeLayer(ModelLayers.DROWNED_INNER_ARMOR)),
-                new ModelSlashDrowned<>(context.bakeLayer(ModelLayers.DROWNED_OUTER_ARMOR)),
-                context.getModelManager()));
+            new ModelSlashDrowned<>(context.bakeLayer(ModelLayers.DROWNED_INNER_ARMOR)),
+            new ModelSlashDrowned<>(context.bakeLayer(ModelLayers.DROWNED_OUTER_ARMOR)),
+            context.getModelManager()));
         this.addLayer(new LayerSlashDrownedOuter(this, context.getModelSet()));
         this.addLayer(new LayerSlashEntityBlade<>(this));
     }
-
+    
     @Override
     protected void setupRotations(EntitySlashDrowned entityLiving, PoseStack poseStack, float ageInTicks, float rotationYaw, float partialTicks) {
         super.setupRotations(entityLiving, poseStack, ageInTicks, rotationYaw, partialTicks);
@@ -44,7 +44,7 @@ public class RendererSlashDrowned extends HumanoidMobRenderer<EntitySlashDrowned
             poseStack.rotateAround(Axis.XP.rotationDegrees(f2), 0.0F, entityLiving.getBbHeight() / 2.0F, 0.0F);
         }
     }
-
+    
     @Override
     public ResourceLocation getTextureLocation(EntitySlashDrowned entity) {
         return DROWNED_LOCATION;

@@ -21,21 +21,21 @@ import java.util.Set;
 public class ShareGossipWithSlashVillager extends Behavior<Villager> {
     public ShareGossipWithSlashVillager() {
         super(ImmutableMap.of(
-                MemoryModuleType.INTERACTION_TARGET, MemoryStatus.VALUE_PRESENT,
-                MemoryModuleType.NEAREST_VISIBLE_LIVING_ENTITIES, MemoryStatus.VALUE_PRESENT
+            MemoryModuleType.INTERACTION_TARGET, MemoryStatus.VALUE_PRESENT,
+            MemoryModuleType.NEAREST_VISIBLE_LIVING_ENTITIES, MemoryStatus.VALUE_PRESENT
         ));
     }
-
+    
     @Override
     protected boolean checkExtraStartConditions(ServerLevel level, Villager owner) {
         return BehaviorUtils.targetIsValid(owner.getBrain(), MemoryModuleType.INTERACTION_TARGET, SlashMobsEntities.SLASH_VILLAGER.get());
     }
-
+    
     @Override
     protected boolean canStillUse(ServerLevel level, Villager entity, long gameTime) {
         return this.checkExtraStartConditions(level, entity);
     }
-
+    
     @Override
     protected void start(ServerLevel level, Villager entity, long gameTime) {
         entity.getBrain().getMemory(MemoryModuleType.INTERACTION_TARGET).ifPresent(living -> {
@@ -44,7 +44,7 @@ public class ShareGossipWithSlashVillager extends Behavior<Villager> {
             }
         });
     }
-
+    
     @Override
     protected void tick(ServerLevel level, Villager owner, long gameTime) {
         owner.getBrain().getMemory(MemoryModuleType.INTERACTION_TARGET).ifPresent(living -> {
@@ -59,12 +59,12 @@ public class ShareGossipWithSlashVillager extends Behavior<Villager> {
             }
         });
     }
-
+    
     @Override
     protected void stop(ServerLevel level, Villager entity, long gameTime) {
         entity.getBrain().eraseMemory(MemoryModuleType.INTERACTION_TARGET);
     }
-
+    
     /**
      * @see TradeWithVillager
      */
@@ -72,7 +72,7 @@ public class ShareGossipWithSlashVillager extends Behavior<Villager> {
         SimpleContainer simplecontainer = villager.getInventory();
         ItemStack itemStack = ItemStack.EMPTY;
         int i = 0;
-
+        
         while (i < simplecontainer.getContainerSize()) {
             ItemStack itemStack1;
             Item item;
@@ -87,23 +87,23 @@ public class ShareGossipWithSlashVillager extends Behavior<Villager> {
                             j = itemStack1.getCount() / 2;
                             break label28;
                         }
-
+                        
                         if (itemStack1.getCount() > 24) {
                             j = itemStack1.getCount() - 24;
                             break label28;
                         }
                     }
                 }
-
+                
                 ++i;
                 continue;
             }
-
+            
             itemStack1.shrink(j);
             itemStack = new ItemStack(item, j);
             break;
         }
-
+        
         if (!itemStack.isEmpty()) {
             entity.setItemSlot(EquipmentSlot.OFFHAND, itemStack);
         }

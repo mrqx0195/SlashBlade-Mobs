@@ -33,29 +33,29 @@ import java.util.Set;
 public class EntitySlashSkeleton extends Skeleton implements ISlashBladeEntity {
     @Nullable
     public VanillaConvertedVmdAnimation currentAnimation;
-
+    
     public EntitySlashSkeleton(EntityType<? extends Skeleton> entityType, Level level) {
         super(entityType, level);
         this.xpReward *= 2;
     }
-
+    
     public static AttributeSupplier.Builder createAttributes() {
         return Monster.createMonsterAttributes()
-                .add(Attributes.ATTACK_DAMAGE, 0.0)
-                .add(Attributes.MOVEMENT_SPEED, 0.25);
+            .add(Attributes.ATTACK_DAMAGE, 0.0)
+            .add(Attributes.MOVEMENT_SPEED, 0.25);
     }
-
+    
     @Override
     protected void registerGoals() {
         addSlashSkeletonGoals(this);
     }
-
+    
     public static <T extends PathfinderMob & ISlashBladeEntity> void addSlashSkeletonGoals(T slashSkeleton) {
         slashSkeleton.goalSelector.addGoal(2, new RestrictSunGoal(slashSkeleton));
         slashSkeleton.goalSelector.addGoal(3, new FleeSunGoal(slashSkeleton, 1.0D));
         slashSkeleton.goalSelector.addGoal(3, new AvoidEntityGoal<>(slashSkeleton, Wolf.class, 6.0F, 1.0D, 1.2D));
         slashSkeleton.goalSelector.addGoal(4, new SimpleSlashGoal<>(slashSkeleton, 1.1, 7, false,
-                false, true, false, false, false, false));
+            false, true, false, false, false, false));
         slashSkeleton.goalSelector.addGoal(5, new WaterAvoidingRandomStrollGoal(slashSkeleton, 1.0D));
         slashSkeleton.goalSelector.addGoal(6, new LookAtPlayerGoal(slashSkeleton, Player.class, 8.0F));
         slashSkeleton.goalSelector.addGoal(6, new RandomLookAroundGoal(slashSkeleton));
@@ -64,7 +64,7 @@ public class EntitySlashSkeleton extends Skeleton implements ISlashBladeEntity {
         slashSkeleton.targetSelector.addGoal(3, new NearestAttackableTargetGoal<>(slashSkeleton, IronGolem.class, true));
         slashSkeleton.targetSelector.addGoal(3, new NearestAttackableTargetGoal<>(slashSkeleton, Turtle.class, 10, true, false, Turtle.BABY_ON_LAND_SELECTOR));
     }
-
+    
     @Override
     protected void populateDefaultEquipmentSlots(RandomSource random, DifficultyInstance difficulty) {
         super.populateDefaultEquipmentSlots(random, difficulty);
@@ -79,11 +79,11 @@ public class EntitySlashSkeleton extends Skeleton implements ISlashBladeEntity {
             }
         }
     }
-
+    
     @Override
     public void reassessWeaponGoal() {
     }
-
+    
     @Override
     public void tick() {
         super.tick();
@@ -95,12 +95,12 @@ public class EntitySlashSkeleton extends Skeleton implements ISlashBladeEntity {
                 }
             }
         }
-
+        
         if (this.getItemInHand(InteractionHand.MAIN_HAND).getItem() instanceof ItemSlashBlade) {
             this.getItemInHand(InteractionHand.MAIN_HAND).inventoryTick(this.level(), this, 0, true);
         }
     }
-
+    
     @Override
     protected void doFreezeConversion() {
         this.convertTo(SlashMobsEntities.SLASH_STRAY.get(), true);
@@ -108,32 +108,32 @@ public class EntitySlashSkeleton extends Skeleton implements ISlashBladeEntity {
             this.level().levelEvent(null, 1048, this.blockPosition(), 0);
         }
     }
-
+    
     @Override
     public double getMeleeAttackRangeSqr(LivingEntity entity) {
         AtomicDouble attackDistance = new AtomicDouble(super.getMeleeAttackRangeSqr(entity));
         this.getMainHandItem().getCapability(ItemSlashBlade.BLADESTATE).ifPresent(state ->
-                attackDistance.set(TargetSelector.getResolvedReach(this)));
+            attackDistance.set(TargetSelector.getResolvedReach(this)));
         return attackDistance.get() * attackDistance.get();
     }
-
+    
     @Override
     public boolean canProgressCombo(LivingEntity target, ResourceLocation current, ResourceLocation next) {
         return this.canUseCombo(next);
     }
-
+    
     @Override
     public boolean canUseCombo(ResourceLocation combo) {
         return !combo.equals(ComboStateRegistry.COMBO_A1.getId()) &&
-                !combo.equals(ComboStateRegistry.AERIAL_RAVE_B3.getId()) &&
-                !combo.equals(ComboStateRegistry.AERIAL_CLEAVE.getId());
+            !combo.equals(ComboStateRegistry.AERIAL_RAVE_B3.getId()) &&
+            !combo.equals(ComboStateRegistry.AERIAL_CLEAVE.getId());
     }
-
+    
     @Override
     public Set<Class<? extends Entity>> getAttackableEntities() {
         return Set.of(Player.class, IronGolem.class, Turtle.class, Wolf.class);
     }
-
+    
     @Override
     public void setCurrentAnimation(@Nullable VanillaConvertedVmdAnimation currentAnimation) {
         this.currentAnimation = currentAnimation;
@@ -141,12 +141,12 @@ public class EntitySlashSkeleton extends Skeleton implements ISlashBladeEntity {
             this.currentAnimation.play();
         }
     }
-
+    
     @Override
     public @Nullable VanillaConvertedVmdAnimation getCurrentAnimation() {
         return this.currentAnimation;
     }
-
+    
     @Override
     public boolean useUpperSlashJump() {
         return true;

@@ -35,7 +35,7 @@ public class SlashBladeEventHandler {
             }
         }
     }
-
+    
     @SubscribeEvent
     public static void onLivingAttackEvent(LivingAttackEvent event) {
         ISlashBladeEntity slashBladeEntity = null;
@@ -45,23 +45,23 @@ public class SlashBladeEventHandler {
         if (event.getSource().getDirectEntity() instanceof ISlashBladeEntity) {
             slashBladeEntity = (ISlashBladeEntity) event.getSource().getEntity();
         }
-
+        
         if (slashBladeEntity instanceof EntitySlashVillager slashVillager) {
             if (!slashVillager.processTargetList(slashVillager.level(), slashVillager, slashVillager.getBoundingBox(), 0, List.of(event.getEntity()))
-                    .contains(event.getEntity())) {
+                .contains(event.getEntity())) {
                 event.setCanceled(true);
             }
         }
         if (slashBladeEntity instanceof EntitySlashIllager slashIllager) {
             if (!slashIllager.processTargetList(slashIllager.level(), slashIllager, slashIllager.getBoundingBox(), 0, List.of(event.getEntity()))
-                    .contains(event.getEntity())) {
+                .contains(event.getEntity())) {
                 event.setCanceled(true);
             }
         }
     }
-
+    
     @SubscribeEvent
-    public static void onChargeActionEvent(SlashBladeEvent.ChargeActionEvent event) {
+    public static void onChargeActionEvent(SlashBladeEvent.PerformSlashArtEvent event) {
         if (event.getEntityLiving() instanceof EntitySlashVillager slashVillager) {
             onChargeAction(event, slashVillager);
         }
@@ -69,7 +69,7 @@ public class SlashBladeEventHandler {
             onChargeAction(event, slashIllager);
         }
     }
-
+    
     @SubscribeEvent
     public static void onPowerBladeEvent(SlashBladeEvent.PowerBladeEvent event) {
         if (event.getUser() instanceof EntitySlashVillager slashVillager) {
@@ -85,8 +85,8 @@ public class SlashBladeEventHandler {
             }
         }
     }
-
-    private static void onChargeAction(SlashBladeEvent.ChargeActionEvent event, EntitySlashVillager slashVillager) {
+    
+    private static void onChargeAction(SlashBladeEvent.PerformSlashArtEvent event, EntitySlashVillager slashVillager) {
         SlashVillagerProfessionSettings professionSettings = slashVillager.getSlashVillagerProfessionSettings();
         if (professionSettings != null) {
             if (!professionSettings.canDoSlashArts) {
@@ -104,8 +104,8 @@ public class SlashBladeEventHandler {
             }
         }
     }
-
-    private static void onChargeAction(SlashBladeEvent.ChargeActionEvent event, EntitySlashIllager slashIllager) {
+    
+    private static void onChargeAction(SlashBladeEvent.PerformSlashArtEvent event, EntitySlashIllager slashIllager) {
         SlashVillagerProfessionSettings professionSettings = slashIllager.getSlashVillagerProfessionSettings();
         if (professionSettings != null) {
             if (!professionSettings.canDoSlashArts) {

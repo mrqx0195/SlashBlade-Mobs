@@ -39,35 +39,35 @@ import java.util.Set;
 public class EntitySlashHusk extends Husk implements ISlashBladeEntity {
     @Nullable
     public VanillaConvertedVmdAnimation currentAnimation;
-
+    
     public EntitySlashHusk(EntityType<? extends EntitySlashHusk> entityType, Level level) {
         super(entityType, level);
         this.xpReward *= 2;
     }
-
+    
     public static boolean checkSlashHuskSpawnRules(EntityType<EntitySlashHusk> husk, ServerLevelAccessor level, MobSpawnType spawnType, BlockPos pos, RandomSource random) {
         return checkMonsterSpawnRules(husk, level, spawnType, pos, random) && (spawnType == MobSpawnType.SPAWNER || level.canSeeSky(pos));
     }
-
+    
     @Override
     protected void addBehaviourGoals() {
         EntitySlashZombie.addSlashZombieBehaviours(this);
     }
-
+    
     public static AttributeSupplier.Builder createAttributes() {
         return Monster.createMonsterAttributes()
-                .add(Attributes.FOLLOW_RANGE, 35.0)
-                .add(Attributes.MOVEMENT_SPEED, 0.3)
-                .add(Attributes.ATTACK_DAMAGE, 0.0)
-                .add(Attributes.ARMOR, 2.0)
-                .add(Attributes.SPAWN_REINFORCEMENTS_CHANCE);
+            .add(Attributes.FOLLOW_RANGE, 35.0)
+            .add(Attributes.MOVEMENT_SPEED, 0.3)
+            .add(Attributes.ATTACK_DAMAGE, 0.0)
+            .add(Attributes.ARMOR, 2.0)
+            .add(Attributes.SPAWN_REINFORCEMENTS_CHANCE);
     }
-
+    
     @Override
     public boolean canBreakDoors() {
         return false;
     }
-
+    
     @Override
     @Nullable
     public SpawnGroupData finalizeSpawn(ServerLevelAccessor level, DifficultyInstance difficulty, MobSpawnType reason, @Nullable SpawnGroupData spawnData, @Nullable CompoundTag dataTag) {
@@ -77,7 +77,7 @@ public class EntitySlashHusk extends Husk implements ISlashBladeEntity {
         }
         return spawngroupdata;
     }
-
+    
     @Override
     protected void populateDefaultEquipmentSlots(RandomSource random, DifficultyInstance difficulty) {
         super.populateDefaultEquipmentSlots(random, difficulty);
@@ -93,7 +93,7 @@ public class EntitySlashHusk extends Husk implements ISlashBladeEntity {
             }
         }
     }
-
+    
     @Override
     protected void doUnderWaterConversion() {
         this.convertToZombieType(SlashMobsEntities.SLASH_ZOMBIE.get());
@@ -101,12 +101,12 @@ public class EntitySlashHusk extends Husk implements ISlashBladeEntity {
             this.level().levelEvent(null, 1040, this.blockPosition(), 0);
         }
     }
-
+    
     @Override
     protected boolean canReplaceCurrentItem(ItemStack candidate, ItemStack existing) {
         return false;
     }
-
+    
     @Override
     public void tick() {
         super.tick();
@@ -118,38 +118,38 @@ public class EntitySlashHusk extends Husk implements ISlashBladeEntity {
                 }
             }
         }
-
+        
         if (this.getItemInHand(InteractionHand.MAIN_HAND).getItem() instanceof ItemSlashBlade) {
             this.getItemInHand(InteractionHand.MAIN_HAND).inventoryTick(this.level(), this, 0, true);
         }
     }
-
+    
     @Override
     public double getMeleeAttackRangeSqr(LivingEntity entity) {
         AtomicDouble attackDistance = new AtomicDouble(super.getMeleeAttackRangeSqr(entity));
         this.getMainHandItem().getCapability(ItemSlashBlade.BLADESTATE).ifPresent(state ->
-                attackDistance.set(TargetSelector.getResolvedReach(this)));
+            attackDistance.set(TargetSelector.getResolvedReach(this)));
         return attackDistance.get() * attackDistance.get();
     }
-
+    
     @Override
     public boolean canProgressCombo(LivingEntity target, ResourceLocation current, ResourceLocation next) {
         return this.canUseCombo(next);
     }
-
+    
     @Override
     public boolean canUseCombo(ResourceLocation combo) {
         return !combo.equals(ComboStateRegistry.COMBO_C.getId()) &&
-                !combo.equals(ComboStateRegistry.COMBO_A4.getId()) &&
-                !combo.equals(ComboStateRegistry.UPPERSLASH.getId()) &&
-                !combo.equals(ComboStateRegistry.AERIAL_CLEAVE.getId());
+            !combo.equals(ComboStateRegistry.COMBO_A4.getId()) &&
+            !combo.equals(ComboStateRegistry.UPPERSLASH.getId()) &&
+            !combo.equals(ComboStateRegistry.AERIAL_CLEAVE.getId());
     }
-
+    
     @Override
     public Set<Class<? extends Entity>> getAttackableEntities() {
         return Set.of(Player.class, AbstractVillager.class, IronGolem.class, Turtle.class);
     }
-
+    
     @Override
     public void setCurrentAnimation(@Nullable VanillaConvertedVmdAnimation currentAnimation) {
         this.currentAnimation = currentAnimation;
@@ -157,7 +157,7 @@ public class EntitySlashHusk extends Husk implements ISlashBladeEntity {
             this.currentAnimation.play();
         }
     }
-
+    
     @Override
     public @Nullable VanillaConvertedVmdAnimation getCurrentAnimation() {
         return this.currentAnimation;

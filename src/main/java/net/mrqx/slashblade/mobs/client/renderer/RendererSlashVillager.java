@@ -15,14 +15,14 @@ import net.mrqx.slashblade.mobs.entity.villager.EntitySlashVillager;
 
 public class RendererSlashVillager extends MobRenderer<EntitySlashVillager, ModelSlashVillager<EntitySlashVillager>> {
     private static final ResourceLocation VILLAGER_BASE_SKIN = SlashBladeMobs.prefix("textures/entity/slash_villager.png");
-
+    
     public RendererSlashVillager(EntityRendererProvider.Context context) {
         super(context, new ModelSlashVillager<>(context.bakeLayer(ClientHandler.SLASH_VILLAGER)), 0.5F);
         this.addLayer(new CustomHeadLayer<>(this, context.getModelSet(), context.getItemInHandRenderer()));
         this.addLayer(new VillagerProfessionLayer<>(this, context.getResourceManager(), "villager"));
         this.addLayer(new LayerSlashEntityBlade<>(this));
     }
-
+    
     @Override
     protected void setupRotations(EntitySlashVillager entityLiving, PoseStack poseStack, float ageInTicks, float rotationYaw, float partialTicks) {
         super.setupRotations(entityLiving, poseStack, ageInTicks, rotationYaw, partialTicks);
@@ -31,12 +31,12 @@ public class RendererSlashVillager extends MobRenderer<EntitySlashVillager, Mode
             currentAnimation.setTickDelta(partialTicks);
         }
     }
-
+    
     @Override
     public ResourceLocation getTextureLocation(EntitySlashVillager entity) {
         return VILLAGER_BASE_SKIN;
     }
-
+    
     @Override
     protected void scale(EntitySlashVillager livingEntity, PoseStack poseStack, float partialTickTime) {
         float f = 0.9375F;
@@ -46,7 +46,7 @@ public class RendererSlashVillager extends MobRenderer<EntitySlashVillager, Mode
         } else {
             this.shadowRadius = 0.5F;
         }
-
+        
         poseStack.scale(f, f, f);
     }
 }

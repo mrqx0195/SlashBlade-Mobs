@@ -36,18 +36,18 @@ import java.util.Set;
 public class EntitySlashStray extends Stray implements ISlashBladeEntity {
     @Nullable
     public VanillaConvertedVmdAnimation currentAnimation;
-
+    
     public EntitySlashStray(EntityType<? extends Stray> entityType, Level level) {
         super(entityType, level);
         this.xpReward *= 2;
     }
-
+    
     public static AttributeSupplier.Builder createAttributes() {
         return Monster.createMonsterAttributes()
-                .add(Attributes.ATTACK_DAMAGE, 0.0)
-                .add(Attributes.MOVEMENT_SPEED, 0.25);
+            .add(Attributes.ATTACK_DAMAGE, 0.0)
+            .add(Attributes.MOVEMENT_SPEED, 0.25);
     }
-
+    
     public static boolean checkSlashStraySpawnRules(EntityType<EntitySlashStray> stray, ServerLevelAccessor level, MobSpawnType spawnType, BlockPos pos, RandomSource random) {
         BlockPos blockpos = pos;
         do {
@@ -55,12 +55,12 @@ public class EntitySlashStray extends Stray implements ISlashBladeEntity {
         } while (level.getBlockState(blockpos).is(Blocks.POWDER_SNOW));
         return checkMonsterSpawnRules(stray, level, spawnType, pos, random) && (spawnType == MobSpawnType.SPAWNER || level.canSeeSky(blockpos.below()));
     }
-
+    
     @Override
     protected void registerGoals() {
         EntitySlashSkeleton.addSlashSkeletonGoals(this);
     }
-
+    
     @Override
     protected void populateDefaultEquipmentSlots(RandomSource random, DifficultyInstance difficulty) {
         super.populateDefaultEquipmentSlots(random, difficulty);
@@ -76,11 +76,11 @@ public class EntitySlashStray extends Stray implements ISlashBladeEntity {
             }
         }
     }
-
+    
     @Override
     public void reassessWeaponGoal() {
     }
-
+    
     @Override
     public void tick() {
         super.tick();
@@ -92,37 +92,37 @@ public class EntitySlashStray extends Stray implements ISlashBladeEntity {
                 }
             }
         }
-
+        
         if (this.getItemInHand(InteractionHand.MAIN_HAND).getItem() instanceof ItemSlashBlade) {
             this.getItemInHand(InteractionHand.MAIN_HAND).inventoryTick(this.level(), this, 0, true);
         }
     }
-
+    
     @Override
     public double getMeleeAttackRangeSqr(LivingEntity entity) {
         AtomicDouble attackDistance = new AtomicDouble(super.getMeleeAttackRangeSqr(entity));
         this.getMainHandItem().getCapability(ItemSlashBlade.BLADESTATE).ifPresent(state ->
-                attackDistance.set(TargetSelector.getResolvedReach(this)));
+            attackDistance.set(TargetSelector.getResolvedReach(this)));
         return attackDistance.get() * attackDistance.get();
     }
-
+    
     @Override
     public boolean canProgressCombo(LivingEntity target, ResourceLocation current, ResourceLocation next) {
         return this.canUseCombo(next);
     }
-
+    
     @Override
     public boolean canUseCombo(ResourceLocation combo) {
         return !combo.equals(ComboStateRegistry.COMBO_A1.getId()) &&
-                !combo.equals(ComboStateRegistry.AERIAL_RAVE_A3.getId()) &&
-                !combo.equals(ComboStateRegistry.AERIAL_CLEAVE.getId());
+            !combo.equals(ComboStateRegistry.AERIAL_RAVE_A3.getId()) &&
+            !combo.equals(ComboStateRegistry.AERIAL_CLEAVE.getId());
     }
-
+    
     @Override
     public Set<Class<? extends Entity>> getAttackableEntities() {
         return Set.of(Player.class, IronGolem.class, Turtle.class, Wolf.class);
     }
-
+    
     @Override
     public void setCurrentAnimation(@Nullable VanillaConvertedVmdAnimation currentAnimation) {
         this.currentAnimation = currentAnimation;
@@ -130,12 +130,12 @@ public class EntitySlashStray extends Stray implements ISlashBladeEntity {
             this.currentAnimation.play();
         }
     }
-
+    
     @Override
     public @Nullable VanillaConvertedVmdAnimation getCurrentAnimation() {
         return this.currentAnimation;
     }
-
+    
     @Override
     public boolean useUpperSlashJump() {
         return true;

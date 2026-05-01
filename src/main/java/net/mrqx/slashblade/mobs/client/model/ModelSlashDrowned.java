@@ -12,7 +12,7 @@ public class ModelSlashDrowned<T extends Drowned & ISlashBladeEntity> extends Mo
     public ModelSlashDrowned(ModelPart root) {
         super(root);
     }
-
+    
     @Override
     public void setupAnim(T entity, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch) {
         super.setupAnim(entity, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch);

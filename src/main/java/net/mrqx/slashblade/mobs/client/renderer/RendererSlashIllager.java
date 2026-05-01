@@ -15,12 +15,12 @@ import net.mrqx.slashblade.mobs.entity.villager.EntitySlashIllager;
 @OnlyIn(Dist.CLIENT)
 public class RendererSlashIllager extends IllagerRenderer<EntitySlashIllager> {
     private static final ResourceLocation VINDICATOR = ResourceLocation.parse("textures/entity/illager/vindicator.png");
-
+    
     public RendererSlashIllager(EntityRendererProvider.Context context) {
         super(context, new ModelSlashIllager<>(context.bakeLayer(ModelLayers.PILLAGER)), 0.5F);
         this.addLayer(new LayerSlashEntityBlade<>(this));
     }
-
+    
     @Override
     protected void setupRotations(EntitySlashIllager entityLiving, PoseStack poseStack, float ageInTicks, float rotationYaw, float partialTicks) {
         super.setupRotations(entityLiving, poseStack, ageInTicks, rotationYaw, partialTicks);
@@ -29,7 +29,7 @@ public class RendererSlashIllager extends IllagerRenderer<EntitySlashIllager> {
             currentAnimation.setTickDelta(partialTicks);
         }
     }
-
+    
     @Override
     public ResourceLocation getTextureLocation(EntitySlashIllager entity) {
         return VINDICATOR;

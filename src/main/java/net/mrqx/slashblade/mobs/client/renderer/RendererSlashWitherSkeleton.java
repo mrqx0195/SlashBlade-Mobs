@@ -16,16 +16,16 @@ import net.mrqx.slashblade.mobs.entity.EntitySlashWitherSkeleton;
 @OnlyIn(Dist.CLIENT)
 public class RendererSlashWitherSkeleton extends HumanoidMobRenderer<EntitySlashWitherSkeleton, ModelSlashHumanoidMobs<EntitySlashWitherSkeleton>> {
     private static final ResourceLocation WITHER_SKELETON_LOCATION = ResourceLocation.parse("textures/entity/skeleton/wither_skeleton.png");
-
+    
     public RendererSlashWitherSkeleton(EntityRendererProvider.Context context) {
         super(context, new ModelSlashHumanoidMobs<>(context.bakeLayer(ModelLayers.WITHER_SKELETON)), 0.5F);
         this.addLayer(new LayerSlashEntityArmor<>(this,
-                new ModelSlashHumanoidMobs<>(context.bakeLayer(ModelLayers.WITHER_SKELETON_INNER_ARMOR)),
-                new ModelSlashHumanoidMobs<>(context.bakeLayer(ModelLayers.WITHER_SKELETON_OUTER_ARMOR)),
-                context.getModelManager()));
+            new ModelSlashHumanoidMobs<>(context.bakeLayer(ModelLayers.WITHER_SKELETON_INNER_ARMOR)),
+            new ModelSlashHumanoidMobs<>(context.bakeLayer(ModelLayers.WITHER_SKELETON_OUTER_ARMOR)),
+            context.getModelManager()));
         this.addLayer(new LayerSlashEntityBlade<>(this));
     }
-
+    
     @Override
     protected void setupRotations(EntitySlashWitherSkeleton entityLiving, PoseStack poseStack, float ageInTicks, float rotationYaw, float partialTicks) {
         super.setupRotations(entityLiving, poseStack, ageInTicks, rotationYaw, partialTicks);
@@ -34,17 +34,17 @@ public class RendererSlashWitherSkeleton extends HumanoidMobRenderer<EntitySlash
             currentAnimation.setTickDelta(partialTicks);
         }
     }
-
+    
     @Override
     public ResourceLocation getTextureLocation(EntitySlashWitherSkeleton entity) {
         return WITHER_SKELETON_LOCATION;
     }
-
+    
     @Override
     protected boolean isShaking(EntitySlashWitherSkeleton entity) {
         return super.isShaking(entity);
     }
-
+    
     @Override
     protected void scale(EntitySlashWitherSkeleton livingEntity, PoseStack poseStack, float partialTickTime) {
         poseStack.scale(1.2F, 1.2F, 1.2F);

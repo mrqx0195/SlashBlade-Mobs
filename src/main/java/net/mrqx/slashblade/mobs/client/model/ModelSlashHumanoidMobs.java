@@ -19,7 +19,7 @@ public class ModelSlashHumanoidMobs<T extends Mob & ISlashBladeEntity> extends H
     protected final ModelPart root;
     protected final Map<ModelPart, String> partMap;
     protected float bodyRotX = 0, bodyRotY = 0, bodyRotZ = 0;
-
+    
     public ModelSlashHumanoidMobs(ModelPart root) {
         super(root);
         this.root = root;
@@ -32,71 +32,71 @@ public class ModelSlashHumanoidMobs<T extends Mob & ISlashBladeEntity> extends H
         partMap.put(this.rightLeg, "right leg");
         partMap.put(this.body, "torso");
     }
-
+    
     @Override
     public void setupAnim(T entity, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch) {
         this.root.getAllParts().forEach(ModelPart::resetPose);
         super.setupAnim(entity, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch);
         ModelUtils.processAnimation(entity, this);
     }
-
+    
     @Override
     public void renderToBuffer(PoseStack poseStack, VertexConsumer buffer, int packedLight, int packedOverlay, float red, float green, float blue, float alpha) {
         ModelUtils.processSlashModel(poseStack, this, poseStack1 -> {
             if (this.young) {
                 ModelUtils.processYoungHumanoidModel(poseStack1,
-                        poseStack2 -> this.headParts().forEach(modelPart ->
-                                modelPart.render(poseStack2, buffer, packedLight, packedOverlay, red, green, blue, alpha)),
-                        poseStack2 -> this.bodyParts().forEach(modelPart ->
-                                modelPart.render(poseStack, buffer, packedLight, packedOverlay, red, green, blue, alpha)));
+                    poseStack2 -> this.headParts().forEach(modelPart ->
+                        modelPart.render(poseStack2, buffer, packedLight, packedOverlay, red, green, blue, alpha)),
+                    poseStack2 -> this.bodyParts().forEach(modelPart ->
+                        modelPart.render(poseStack, buffer, packedLight, packedOverlay, red, green, blue, alpha)));
             } else {
                 this.headParts().forEach(modelPart ->
-                        modelPart.render(poseStack, buffer, packedLight, packedOverlay, red, green, blue, alpha));
+                    modelPart.render(poseStack, buffer, packedLight, packedOverlay, red, green, blue, alpha));
                 this.bodyParts().forEach(modelPart ->
-                        modelPart.render(poseStack, buffer, packedLight, packedOverlay, red, green, blue, alpha));
+                    modelPart.render(poseStack, buffer, packedLight, packedOverlay, red, green, blue, alpha));
             }
         });
     }
-
+    
     @Override
     protected void setupAttackAnimation(T livingEntity, float ageInTicks) {
     }
-
+    
     @Override
     public ModelPart getBody() {
         return this.body;
     }
-
+    
     @Override
     public float getBodyRotX() {
         return bodyRotX;
     }
-
+    
     @Override
     public float getBodyRotY() {
         return bodyRotY;
     }
-
+    
     @Override
     public float getBodyRotZ() {
         return bodyRotZ;
     }
-
+    
     @Override
     public void setBodyRotX(float bodyRotX) {
         this.bodyRotX = bodyRotX;
     }
-
+    
     @Override
     public void setBodyRotY(float bodyRotY) {
         this.bodyRotY = bodyRotY;
     }
-
+    
     @Override
     public void setBodyRotZ(float bodyRotZ) {
         this.bodyRotZ = bodyRotZ;
     }
-
+    
     @Override
     public Map<ModelPart, String> getPartMap() {
         return partMap;

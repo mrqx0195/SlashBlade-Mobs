@@ -18,7 +18,7 @@ public class DataGen {
     public DataGen() {
         super();
     }
-
+    
     @SubscribeEvent
     public static void dataGen(GatherDataEvent event) {
         DataGenerator dataGenerator = event.getGenerator();
@@ -26,6 +26,6 @@ public class DataGen {
         PackOutput packOutput = dataGenerator.getPackOutput();
         ExistingFileHelper existingFileHelper = event.getExistingFileHelper();
         dataGenerator.addProvider(event.includeServer(), new EntityTypeTagProvider(packOutput, lookupProvider,
-                SlashBladeMobs.MODID, existingFileHelper));
+            SlashBladeMobs.MODID, existingFileHelper));
     }
 }

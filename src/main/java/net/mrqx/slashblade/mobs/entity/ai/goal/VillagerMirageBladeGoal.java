@@ -13,12 +13,12 @@ import javax.annotation.Nullable;
 public class VillagerMirageBladeGoal<T extends PathfinderMob & ISlashBladeEntity & VillagerDataHolder & RangedAttackMob> extends SimpleMirageBladeGoal<T> {
     @Nullable
     public SlashVillagerProfessionSettings professionSettings;
-
+    
     public VillagerMirageBladeGoal(T rangedAttackMob, double speedModifier) {
         super(rangedAttackMob, speedModifier, false, false, false, false, false);
         this.refreshProfessionSettings(entity.getVillagerData());
     }
-
+    
     public void refreshProfessionSettings(VillagerData villagerData) {
         professionSettings = SlashVillagerProfessionSettings.getSettings(villagerData.getProfession(), villagerData.getLevel());
         if (professionSettings != null) {
@@ -29,27 +29,27 @@ public class VillagerMirageBladeGoal<T extends PathfinderMob & ISlashBladeEntity
             this.canUseHeavyRainSword = professionSettings.canUseHeavyRainSword;
         }
     }
-
+    
     @Override
     public int getBaseSummonedSwordCooldown() {
         return 20 * 2 / entity.getVillagerData().getLevel();
     }
-
+    
     @Override
     public int getSpiralSwordCooldown() {
         return 200 * 2 / entity.getVillagerData().getLevel();
     }
-
+    
     @Override
     public int getStormSwordCooldown() {
         return 200 * 2 / entity.getVillagerData().getLevel();
     }
-
+    
     @Override
     public int getBlisteringSwordCooldown() {
         return 400 * 2 / entity.getVillagerData().getLevel();
     }
-
+    
     @Override
     public int getHeavyRainSwordCooldown() {
         return 600 * 2 / entity.getVillagerData().getLevel();

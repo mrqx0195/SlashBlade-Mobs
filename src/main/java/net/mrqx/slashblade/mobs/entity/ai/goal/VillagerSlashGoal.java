@@ -12,12 +12,12 @@ import javax.annotation.Nullable;
 public class VillagerSlashGoal<T extends PathfinderMob & ISlashBladeEntity & VillagerDataHolder> extends SimpleSlashGoal<T> {
     @Nullable
     public SlashVillagerProfessionSettings professionSettings;
-
+    
     public VillagerSlashGoal(T mob, double speedModifier, int attackCooldown) {
         super(mob, speedModifier, attackCooldown, true);
         this.refreshProfessionSettings(mob.getVillagerData());
     }
-
+    
     public void refreshProfessionSettings(VillagerData villagerData) {
         professionSettings = SlashVillagerProfessionSettings.getSettings(villagerData.getProfession(), villagerData.getLevel());
         if (professionSettings != null) {

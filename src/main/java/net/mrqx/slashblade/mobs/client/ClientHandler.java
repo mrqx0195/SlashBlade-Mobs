@@ -16,7 +16,7 @@ import net.mrqx.slashblade.mobs.registy.SlashMobsEntities;
 @Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
 public class ClientHandler {
     public static final ModelLayerLocation SLASH_VILLAGER = new ModelLayerLocation(SlashBladeMobs.prefix("slash_villager"), "main");
-
+    
     @SubscribeEvent
     public static void registerEntityRenders(EntityRenderersEvent.RegisterRenderers event) {
         event.registerEntityRenderer(SlashMobsEntities.SLASH_ZOMBIE.get(), RendererSlashZombie::new);
@@ -28,7 +28,7 @@ public class ClientHandler {
         event.registerEntityRenderer(SlashMobsEntities.SLASH_VILLAGER.get(), RendererSlashVillager::new);
         event.registerEntityRenderer(SlashMobsEntities.SLASH_ILLAGER.get(), RendererSlashIllager::new);
     }
-
+    
     @SubscribeEvent
     public static void registerLayers(EntityRenderersEvent.RegisterLayerDefinitions event) {
         event.registerLayerDefinition(SLASH_VILLAGER, () -> LayerDefinition.create(ModelSlashVillager.createMesh(), 64, 64));

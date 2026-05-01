@@ -16,16 +16,16 @@ import net.mrqx.slashblade.mobs.entity.EntitySlashZombie;
 @OnlyIn(Dist.CLIENT)
 public class RendererSlashZombie extends HumanoidMobRenderer<EntitySlashZombie, ModelSlashHumanoidMobs<EntitySlashZombie>> {
     private static final ResourceLocation ZOMBIE_LOCATION = ResourceLocation.parse("textures/entity/zombie/zombie.png");
-
+    
     public RendererSlashZombie(EntityRendererProvider.Context context) {
         super(context, new ModelSlashHumanoidMobs<>(context.bakeLayer(ModelLayers.ZOMBIE)), 0.5F);
         this.addLayer(new LayerSlashEntityArmor<>(this,
-                new ModelSlashHumanoidMobs<>(context.bakeLayer(ModelLayers.ZOMBIE_INNER_ARMOR)),
-                new ModelSlashHumanoidMobs<>(context.bakeLayer(ModelLayers.ZOMBIE_OUTER_ARMOR)),
-                context.getModelManager()));
+            new ModelSlashHumanoidMobs<>(context.bakeLayer(ModelLayers.ZOMBIE_INNER_ARMOR)),
+            new ModelSlashHumanoidMobs<>(context.bakeLayer(ModelLayers.ZOMBIE_OUTER_ARMOR)),
+            context.getModelManager()));
         this.addLayer(new LayerSlashEntityBlade<>(this));
     }
-
+    
     @Override
     protected void setupRotations(EntitySlashZombie entityLiving, PoseStack poseStack, float ageInTicks, float rotationYaw, float partialTicks) {
         super.setupRotations(entityLiving, poseStack, ageInTicks, rotationYaw, partialTicks);
@@ -34,12 +34,12 @@ public class RendererSlashZombie extends HumanoidMobRenderer<EntitySlashZombie, 
             currentAnimation.setTickDelta(partialTicks);
         }
     }
-
+    
     @Override
     public ResourceLocation getTextureLocation(EntitySlashZombie entity) {
         return ZOMBIE_LOCATION;
     }
-
+    
     @Override
     protected boolean isShaking(EntitySlashZombie entity) {
         return super.isShaking(entity) || entity.isUnderWaterConverting();

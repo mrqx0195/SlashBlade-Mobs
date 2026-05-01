@@ -17,17 +17,17 @@ import net.mrqx.slashblade.mobs.entity.EntitySlashStray;
 @OnlyIn(Dist.CLIENT)
 public class RendererSlashStray extends HumanoidMobRenderer<EntitySlashStray, ModelSlashHumanoidMobs<EntitySlashStray>> {
     private static final ResourceLocation STRAY_SKELETON_LOCATION = ResourceLocation.parse("textures/entity/skeleton/stray.png");
-
+    
     public RendererSlashStray(EntityRendererProvider.Context context) {
         super(context, new ModelSlashHumanoidMobs<>(context.bakeLayer(ModelLayers.STRAY)), 0.5F);
         this.addLayer(new LayerSlashEntityArmor<>(this,
-                new ModelSlashHumanoidMobs<>(context.bakeLayer(ModelLayers.STRAY_INNER_ARMOR)),
-                new ModelSlashHumanoidMobs<>(context.bakeLayer(ModelLayers.STRAY_OUTER_ARMOR)),
-                context.getModelManager()));
+            new ModelSlashHumanoidMobs<>(context.bakeLayer(ModelLayers.STRAY_INNER_ARMOR)),
+            new ModelSlashHumanoidMobs<>(context.bakeLayer(ModelLayers.STRAY_OUTER_ARMOR)),
+            context.getModelManager()));
         this.addLayer(new LayerSlashStrayClothing<>(this, context.getModelSet()));
         this.addLayer(new LayerSlashEntityBlade<>(this));
     }
-
+    
     @Override
     protected void setupRotations(EntitySlashStray entityLiving, PoseStack poseStack, float ageInTicks, float rotationYaw, float partialTicks) {
         super.setupRotations(entityLiving, poseStack, ageInTicks, rotationYaw, partialTicks);
@@ -36,12 +36,12 @@ public class RendererSlashStray extends HumanoidMobRenderer<EntitySlashStray, Mo
             currentAnimation.setTickDelta(partialTicks);
         }
     }
-
+    
     @Override
     public ResourceLocation getTextureLocation(EntitySlashStray entity) {
         return STRAY_SKELETON_LOCATION;
     }
-
+    
     @Override
     protected boolean isShaking(EntitySlashStray entity) {
         return super.isShaking(entity);

@@ -28,7 +28,7 @@ public class ModelSlashIllager<T extends AbstractIllager & ISlashBladeEntity> ex
     protected final ModelPart rightLeg;
     protected final ModelPart rightArm;
     protected final ModelPart leftArm;
-
+    
     public ModelSlashIllager(ModelPart root) {
         super(root);
         this.root = root;
@@ -40,7 +40,7 @@ public class ModelSlashIllager<T extends AbstractIllager & ISlashBladeEntity> ex
         this.rightLeg = root.getChild("right_leg");
         this.leftArm = root.getChild("left_arm");
         this.rightArm = root.getChild("right_arm");
-
+        
         this.partMap = new HashMap<>();
         partMap.put(this.head, "head");
         partMap.put(this.hat, "head");
@@ -51,7 +51,7 @@ public class ModelSlashIllager<T extends AbstractIllager & ISlashBladeEntity> ex
         partMap.put(this.rightLeg, "right leg");
         partMap.put(this.body, "torso");
     }
-
+    
     @Override
     public void setupAnim(T entity, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch) {
         this.root.getAllParts().forEach(ModelPart::resetPose);
@@ -63,68 +63,68 @@ public class ModelSlashIllager<T extends AbstractIllager & ISlashBladeEntity> ex
         this.leftArm.visible = flag2;
         this.rightArm.visible = flag2;
     }
-
+    
     @Override
     public void renderToBuffer(PoseStack poseStack, VertexConsumer buffer, int packedLight, int packedOverlay, float red, float green, float blue, float alpha) {
         ModelUtils.processSlashModel(poseStack, this, poseStack1 -> {
             if (this.young) {
                 ModelUtils.processYoungHumanoidModel(poseStack1,
-                        poseStack2 -> this.headParts().forEach(modelPart ->
-                                modelPart.render(poseStack2, buffer, packedLight, packedOverlay, red, green, blue, alpha)),
-                        poseStack2 -> this.bodyParts().forEach(modelPart ->
-                                modelPart.render(poseStack, buffer, packedLight, packedOverlay, red, green, blue, alpha)));
+                    poseStack2 -> this.headParts().forEach(modelPart ->
+                        modelPart.render(poseStack2, buffer, packedLight, packedOverlay, red, green, blue, alpha)),
+                    poseStack2 -> this.bodyParts().forEach(modelPart ->
+                        modelPart.render(poseStack, buffer, packedLight, packedOverlay, red, green, blue, alpha)));
             } else {
                 this.headParts().forEach(modelPart ->
-                        modelPart.render(poseStack, buffer, packedLight, packedOverlay, red, green, blue, alpha));
+                    modelPart.render(poseStack, buffer, packedLight, packedOverlay, red, green, blue, alpha));
                 this.bodyParts().forEach(modelPart ->
-                        modelPart.render(poseStack, buffer, packedLight, packedOverlay, red, green, blue, alpha));
+                    modelPart.render(poseStack, buffer, packedLight, packedOverlay, red, green, blue, alpha));
             }
         });
     }
-
+    
     protected Iterable<ModelPart> headParts() {
         return ImmutableList.of(this.head);
     }
-
+    
     protected Iterable<ModelPart> bodyParts() {
         return ImmutableList.of(this.body, this.rightArm, this.leftArm, this.arms, this.rightLeg, this.leftLeg);
     }
-
+    
     @Override
     public ModelPart getBody() {
         return this.body;
     }
-
+    
     @Override
     public float getBodyRotX() {
         return bodyRotX;
     }
-
+    
     @Override
     public float getBodyRotY() {
         return bodyRotY;
     }
-
+    
     @Override
     public float getBodyRotZ() {
         return bodyRotZ;
     }
-
+    
     @Override
     public void setBodyRotX(float bodyRotX) {
         this.bodyRotX = bodyRotX;
     }
-
+    
     @Override
     public void setBodyRotY(float bodyRotY) {
         this.bodyRotY = bodyRotY;
     }
-
+    
     @Override
     public void setBodyRotZ(float bodyRotZ) {
         this.bodyRotZ = bodyRotZ;
     }
-
+    
     @Override
     public Map<ModelPart, String> getPartMap() {
         return partMap;

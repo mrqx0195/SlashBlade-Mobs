@@ -66,7 +66,7 @@ public class EntitySlashDrowned extends Drowned implements ISlashBladeEntity {
     protected final GroundPathNavigation groundNavigation;
     @Nullable
     public VanillaConvertedVmdAnimation currentAnimation;
-
+    
     public EntitySlashDrowned(EntityType<? extends Drowned> entityType, Level level) {
         super(entityType, level);
         this.xpReward *= 2;
@@ -76,18 +76,18 @@ public class EntitySlashDrowned extends Drowned implements ISlashBladeEntity {
         this.waterNavigation = new WaterBoundPathNavigation(this, level);
         this.groundNavigation = new GroundPathNavigation(this, level);
     }
-
+    
     @Override
     protected void addBehaviourGoals() {
         this.goalSelector.addGoal(1, new DrownedGoToWaterGoal(this, 1.0D));
         this.goalSelector.addGoal(2, new SimpleSlashGoal<>(this, 1.1, 7, false)
-                .setAfterSlashConsumer(goal -> {
-                            if (goal.getLastComboStateLocation() != null
-                                    && goal.getLastComboStateLocation().equals(ComboStateRegistry.AERIAL_CLEAVE.getId())) {
-                                goal.resetAttackCooldown();
-                            }
-                        }
-                ));
+            .setAfterSlashConsumer(goal -> {
+                    if (goal.getLastComboStateLocation() != null
+                        && goal.getLastComboStateLocation().equals(ComboStateRegistry.AERIAL_CLEAVE.getId())) {
+                        goal.resetAttackCooldown();
+                    }
+                }
+            ));
         this.goalSelector.addGoal(5, new DrownedGoToBeachGoal(this, 1.0D));
         this.goalSelector.addGoal(6, new DrownedSwimUpGoal(this, 1.0D, this.level().getSeaLevel()));
         this.goalSelector.addGoal(7, new RandomStrollGoal(this, 1.0D));
@@ -98,16 +98,16 @@ public class EntitySlashDrowned extends Drowned implements ISlashBladeEntity {
         this.targetSelector.addGoal(3, new NearestAttackableTargetGoal<>(this, Axolotl.class, true, false));
         this.targetSelector.addGoal(5, new NearestAttackableTargetGoal<>(this, Turtle.class, 10, true, false, Turtle.BABY_ON_LAND_SELECTOR));
     }
-
+    
     public static AttributeSupplier.Builder createAttributes() {
         return Monster.createMonsterAttributes()
-                .add(Attributes.FOLLOW_RANGE, 35.0)
-                .add(Attributes.MOVEMENT_SPEED, 0.23)
-                .add(Attributes.ATTACK_DAMAGE, 0.0)
-                .add(Attributes.ARMOR, 2.0)
-                .add(Attributes.SPAWN_REINFORCEMENTS_CHANCE);
+            .add(Attributes.FOLLOW_RANGE, 35.0)
+            .add(Attributes.MOVEMENT_SPEED, 0.23)
+            .add(Attributes.ATTACK_DAMAGE, 0.0)
+            .add(Attributes.ARMOR, 2.0)
+            .add(Attributes.SPAWN_REINFORCEMENTS_CHANCE);
     }
-
+    
     public static boolean checkSlashDrownedSpawnRules(EntityType<EntitySlashDrowned> ignoredDrowned, ServerLevelAccessor serverLevel, MobSpawnType mobSpawnType, BlockPos pos, RandomSource random) {
         if (!serverLevel.getFluidState(pos.below()).is(FluidTags.WATER)) {
             return false;
@@ -121,17 +121,17 @@ public class EntitySlashDrowned extends Drowned implements ISlashBladeEntity {
             }
         }
     }
-
+    
     @SuppressWarnings("deprecation")
     private static boolean isDeepEnoughToSpawn(LevelAccessor level, BlockPos pos) {
         return pos.getY() < level.getSeaLevel() - 5;
     }
-
+    
     @Override
     public boolean canBreakDoors() {
         return false;
     }
-
+    
     @Override
     public SpawnGroupData finalizeSpawn(ServerLevelAccessor level, DifficultyInstance difficulty, MobSpawnType reason, @Nullable SpawnGroupData spawnData, @Nullable CompoundTag dataTag) {
         SpawnGroupData spawngroupdata = super.finalizeSpawn(level, difficulty, reason, spawnData, dataTag);
@@ -144,7 +144,7 @@ public class EntitySlashDrowned extends Drowned implements ISlashBladeEntity {
         }
         return spawngroupdata;
     }
-
+    
     @Override
     protected void populateDefaultEquipmentSlots(RandomSource random, DifficultyInstance difficulty) {
         super.populateDefaultEquipmentSlots(random, difficulty);
@@ -160,7 +160,7 @@ public class EntitySlashDrowned extends Drowned implements ISlashBladeEntity {
             }
         }
     }
-
+    
     @Override
     public void tick() {
         super.tick();
@@ -172,37 +172,37 @@ public class EntitySlashDrowned extends Drowned implements ISlashBladeEntity {
                 }
             }
         }
-
+        
         if (this.getItemInHand(InteractionHand.MAIN_HAND).getItem() instanceof ItemSlashBlade) {
             this.getItemInHand(InteractionHand.MAIN_HAND).inventoryTick(this.level(), this, 0, true);
         }
     }
-
+    
     @Override
     public double getMeleeAttackRangeSqr(LivingEntity entity) {
         AtomicDouble attackDistance = new AtomicDouble(super.getMeleeAttackRangeSqr(entity));
         this.getMainHandItem().getCapability(ItemSlashBlade.BLADESTATE).ifPresent(state ->
-                attackDistance.set(TargetSelector.getResolvedReach(this)));
+            attackDistance.set(TargetSelector.getResolvedReach(this)));
         return attackDistance.get() * attackDistance.get();
     }
-
+    
     @Override
     public boolean canProgressCombo(LivingEntity target, ResourceLocation current, ResourceLocation next) {
         return this.canUseCombo(next);
     }
-
+    
     @Override
     public boolean canUseCombo(ResourceLocation combo) {
         return !combo.equals(ComboStateRegistry.COMBO_A3.getId()) &&
-                !combo.equals(ComboStateRegistry.COMBO_B1.getId()) &&
-                !combo.equals(ComboStateRegistry.UPPERSLASH.getId());
+            !combo.equals(ComboStateRegistry.COMBO_B1.getId()) &&
+            !combo.equals(ComboStateRegistry.UPPERSLASH.getId());
     }
-
+    
     @Override
     public Set<Class<? extends Entity>> getAttackableEntities() {
         return Set.of(Player.class, AbstractVillager.class, IronGolem.class, Axolotl.class, Turtle.class);
     }
-
+    
     @Override
     public void setCurrentAnimation(@Nullable VanillaConvertedVmdAnimation currentAnimation) {
         this.currentAnimation = currentAnimation;
@@ -210,17 +210,17 @@ public class EntitySlashDrowned extends Drowned implements ISlashBladeEntity {
             this.currentAnimation.play();
         }
     }
-
+    
     @Override
     public @Nullable VanillaConvertedVmdAnimation getCurrentAnimation() {
         return this.currentAnimation;
     }
-
+    
     @Override
     protected boolean canReplaceCurrentItem(ItemStack candidate, ItemStack existing) {
         return false;
     }
-
+    
     boolean wantsToSwim() {
         if (this.searchingForLand) {
             return true;
@@ -229,7 +229,7 @@ public class EntitySlashDrowned extends Drowned implements ISlashBladeEntity {
             return livingentity != null && livingentity.isInWater();
         }
     }
-
+    
     @Override
     public void travel(Vec3 travelVector) {
         if (this.isControlledByLocalInstance() && this.isInWater() && this.wantsToSwim()) {
@@ -239,9 +239,9 @@ public class EntitySlashDrowned extends Drowned implements ISlashBladeEntity {
         } else {
             super.travel(travelVector);
         }
-
+        
     }
-
+    
     @Override
     public void updateSwimming() {
         if (!this.level().isClientSide) {
@@ -253,9 +253,9 @@ public class EntitySlashDrowned extends Drowned implements ISlashBladeEntity {
                 this.setSwimming(false);
             }
         }
-
+        
     }
-
+    
     @Override
     protected boolean closeToNextPos() {
         Path path = this.getNavigation().getPath();
@@ -264,15 +264,15 @@ public class EntitySlashDrowned extends Drowned implements ISlashBladeEntity {
             double d0 = this.distanceToSqr(blockpos.getX(), blockpos.getY(), blockpos.getZ());
             return d0 < 4.0D;
         }
-
+        
         return false;
     }
-
+    
     @Override
     public void setSearchingForLand(boolean searchingForLand) {
         this.searchingForLand = searchingForLand;
     }
-
+    
     protected boolean isCloseToNextPos() {
         Path path = this.getNavigation().getPath();
         if (path != null) {
@@ -280,38 +280,38 @@ public class EntitySlashDrowned extends Drowned implements ISlashBladeEntity {
             double d0 = this.distanceToSqr(blockpos.getX(), blockpos.getY(), blockpos.getZ());
             return d0 < 4.0D;
         }
-
+        
         return false;
     }
-
+    
     static class DrownedGoToBeachGoal extends MoveToBlockGoal {
         private final EntitySlashDrowned drowned;
-
+        
         public DrownedGoToBeachGoal(EntitySlashDrowned drowned, double speedModifier) {
             super(drowned, speedModifier, 8, 2);
             this.drowned = drowned;
         }
-
+        
         @Override
         public boolean canUse() {
             return super.canUse() && !this.drowned.level().isDay() && this.drowned.isInWater() && this.drowned.getY() >= (double) (this.drowned.level().getSeaLevel() - 3);
         }
-
+        
         @Override
         protected boolean isValidTarget(LevelReader level, BlockPos pos) {
             BlockPos blockpos = pos.above();
             return level.isEmptyBlock(blockpos) && level.isEmptyBlock(blockpos.above()) && level.getBlockState(pos).entityCanStandOn(level, pos, this.drowned);
         }
-
+        
         @Override
         public void start() {
             this.drowned.setSearchingForLand(false);
             this.drowned.navigation = this.drowned.groundNavigation;
             super.start();
         }
-
+        
     }
-
+    
     static class DrownedGoToWaterGoal extends Goal {
         private final PathfinderMob mob;
         private double wantedX;
@@ -319,14 +319,14 @@ public class EntitySlashDrowned extends Drowned implements ISlashBladeEntity {
         private double wantedZ;
         private final double speedModifier;
         private final Level level;
-
+        
         public DrownedGoToWaterGoal(PathfinderMob mob, double speedModifier) {
             this.mob = mob;
             this.speedModifier = speedModifier;
             this.level = mob.level();
             this.setFlags(EnumSet.of(Goal.Flag.MOVE));
         }
-
+        
         @Override
         public boolean canUse() {
             if (!this.level.isDay()) {
@@ -345,41 +345,41 @@ public class EntitySlashDrowned extends Drowned implements ISlashBladeEntity {
                 }
             }
         }
-
+        
         @Override
         public boolean canContinueToUse() {
             return !this.mob.getNavigation().isDone();
         }
-
+        
         @Override
         public void start() {
             this.mob.getNavigation().moveTo(this.wantedX, this.wantedY, this.wantedZ, this.speedModifier);
         }
-
+        
         @Nullable
         private Vec3 getWaterPos() {
             RandomSource randomsource = this.mob.getRandom();
             BlockPos blockpos = this.mob.blockPosition();
-
+            
             for (int i = 0; i < 10; ++i) {
                 BlockPos blockPos = blockpos.offset(randomsource.nextInt(20) - 10, 2 - randomsource.nextInt(8), randomsource.nextInt(20) - 10);
                 if (this.level.getBlockState(blockPos).is(Blocks.WATER)) {
                     return Vec3.atBottomCenterOf(blockPos);
                 }
             }
-
+            
             return null;
         }
     }
-
+    
     static class DrownedMoveControl extends MoveControl {
         private final EntitySlashDrowned drowned;
-
+        
         public DrownedMoveControl(EntitySlashDrowned drowned) {
             super(drowned);
             this.drowned = drowned;
         }
-
+        
         @Override
         public void tick() {
             LivingEntity livingentity = this.drowned.getTarget();
@@ -389,12 +389,12 @@ public class EntitySlashDrowned extends Drowned implements ISlashBladeEntity {
                         this.drowned.setDeltaMovement(this.drowned.getDeltaMovement().add(0.0D, 0.002D, 0.0D));
                     }
                 }
-
+                
                 if (this.operation != MoveControl.Operation.MOVE_TO || this.drowned.getNavigation().isDone()) {
                     this.drowned.setSpeed(0.0F);
                     return;
                 }
-
+                
                 double d0 = this.wantedX - this.drowned.getX();
                 double d1 = this.wantedY - this.drowned.getY();
                 double d2 = this.wantedZ - this.drowned.getZ();
@@ -411,35 +411,35 @@ public class EntitySlashDrowned extends Drowned implements ISlashBladeEntity {
                 if (!this.drowned.onGround()) {
                     this.drowned.setDeltaMovement(this.drowned.getDeltaMovement().add(0.0D, -0.008D, 0.0D));
                 }
-
+                
                 super.tick();
             }
-
+            
         }
     }
-
+    
     static class DrownedSwimUpGoal extends Goal {
         private final EntitySlashDrowned drowned;
         private final double speedModifier;
         private final int seaLevel;
         private boolean stuck;
-
+        
         public DrownedSwimUpGoal(EntitySlashDrowned drowned, double speedModifier, int seaLevel) {
             this.drowned = drowned;
             this.speedModifier = speedModifier;
             this.seaLevel = seaLevel;
         }
-
+        
         @Override
         public boolean canUse() {
             return !this.drowned.level().isDay() && this.drowned.isInWater() && this.drowned.getY() < (double) (this.seaLevel - 2);
         }
-
+        
         @Override
         public boolean canContinueToUse() {
             return this.canUse() && !this.stuck;
         }
-
+        
         @Override
         public void tick() {
             boolean b = this.drowned.getNavigation().isDone() || this.drowned.isCloseToNextPos();
@@ -449,18 +449,18 @@ public class EntitySlashDrowned extends Drowned implements ISlashBladeEntity {
                     this.stuck = true;
                     return;
                 }
-
+                
                 this.drowned.getNavigation().moveTo(vec3.x, vec3.y, vec3.z, this.speedModifier);
             }
-
+            
         }
-
+        
         @Override
         public void start() {
             this.drowned.setSearchingForLand(true);
             this.stuck = false;
         }
-
+        
         @Override
         public void stop() {
             this.drowned.setSearchingForLand(false);

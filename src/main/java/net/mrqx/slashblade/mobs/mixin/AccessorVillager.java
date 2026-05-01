@@ -8,7 +8,7 @@ import org.spongepowered.asm.mixin.gen.Accessor;
 public interface AccessorVillager {
     @Accessor("lastGossipTime")
     long getLastGossipTime();
-
+    
     @Accessor("lastGossipTime")
     void setLastGossipTime(long lastGossipTime);
 }

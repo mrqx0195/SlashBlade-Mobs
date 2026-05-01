@@ -16,16 +16,16 @@ import net.mrqx.slashblade.mobs.entity.EntitySlashSkeleton;
 @OnlyIn(Dist.CLIENT)
 public class RendererSlashSkeleton extends HumanoidMobRenderer<EntitySlashSkeleton, ModelSlashHumanoidMobs<EntitySlashSkeleton>> {
     private static final ResourceLocation SKELETON_LOCATION = ResourceLocation.parse("textures/entity/skeleton/skeleton.png");
-
+    
     public RendererSlashSkeleton(EntityRendererProvider.Context context) {
         super(context, new ModelSlashHumanoidMobs<>(context.bakeLayer(ModelLayers.SKELETON)), 0.5F);
         this.addLayer(new LayerSlashEntityArmor<>(this,
-                new ModelSlashHumanoidMobs<>(context.bakeLayer(ModelLayers.SKELETON_INNER_ARMOR)),
-                new ModelSlashHumanoidMobs<>(context.bakeLayer(ModelLayers.SKELETON_OUTER_ARMOR)),
-                context.getModelManager()));
+            new ModelSlashHumanoidMobs<>(context.bakeLayer(ModelLayers.SKELETON_INNER_ARMOR)),
+            new ModelSlashHumanoidMobs<>(context.bakeLayer(ModelLayers.SKELETON_OUTER_ARMOR)),
+            context.getModelManager()));
         this.addLayer(new LayerSlashEntityBlade<>(this));
     }
-
+    
     @Override
     protected void setupRotations(EntitySlashSkeleton entityLiving, PoseStack poseStack, float ageInTicks, float rotationYaw, float partialTicks) {
         super.setupRotations(entityLiving, poseStack, ageInTicks, rotationYaw, partialTicks);
@@ -34,12 +34,12 @@ public class RendererSlashSkeleton extends HumanoidMobRenderer<EntitySlashSkelet
             currentAnimation.setTickDelta(partialTicks);
         }
     }
-
+    
     @Override
     public ResourceLocation getTextureLocation(EntitySlashSkeleton entity) {
         return SKELETON_LOCATION;
     }
-
+    
     @Override
     protected boolean isShaking(EntitySlashSkeleton entity) {
         return super.isShaking(entity);

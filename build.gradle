@@ -127,6 +127,8 @@ dependencies {
 //    modImplementation "maven.modrinth:endinglibrary:2.1.10"
 //    modImplementation "maven.modrinth:goety-revelation:2.3.1"
 
+//    modImplementation "blank:item_icon_exporter-1.0.1-Forge-1.20.1:"
+
     modRuntimeOnly "maven.modrinth:moonlight:1.20-2.16.13-forge"
     modRuntimeOnly "maven.modrinth:mmmmmmmmmmmm:1.20-2.0.9"
     modRuntimeOnly "maven.modrinth:mob-battle-mod:1.20.1-2.5.3-forge"

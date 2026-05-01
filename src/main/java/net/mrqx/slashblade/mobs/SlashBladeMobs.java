@@ -22,11 +22,11 @@ public class SlashBladeMobs {
     public static final Logger LOGGER = LogUtils.getLogger();
     @Nullable
     public static Raid.RaiderType SLASH_ILLAGER_RAIDER_TYPE;
-
+    
     public static ResourceLocation prefix(String s) {
         return ResourceLocation.fromNamespaceAndPath(MODID, s);
     }
-
+    
     public SlashBladeMobs(FMLJavaModLoadingContext modLoadingContext) {
         IEventBus modEventBus = modLoadingContext.getModEventBus();
         SlashMobsEntities.ENTITIES.register(modEventBus);
@@ -35,7 +35,7 @@ public class SlashBladeMobs {
         SlashMobsSpawnModifiers.STRUCTURE_MODIFIERS.register(modEventBus);
         SlashMobsVillagerProfessions.VILLAGER_PROFESSIONS.register(modEventBus);
     }
-
+    
     @SubscribeEvent
     public static void onCommonSetupEvent(FMLCommonSetupEvent event) {
         SLASH_ILLAGER_RAIDER_TYPE = Raid.RaiderType.create("slash_illager", SlashMobsEntities.SLASH_ILLAGER.get(), new int[]{0, 0, 0, 0, 0, 0, 0, 0});
