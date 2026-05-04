@@ -43,7 +43,7 @@ public class SlashBladeEventHandler {
             slashBladeEntity = (ISlashBladeEntity) event.getSource().getEntity();
         }
         if (event.getSource().getDirectEntity() instanceof ISlashBladeEntity) {
-            slashBladeEntity = (ISlashBladeEntity) event.getSource().getEntity();
+            slashBladeEntity = (ISlashBladeEntity) event.getSource().getDirectEntity();
         }
         
         if (slashBladeEntity instanceof EntitySlashVillager slashVillager) {
