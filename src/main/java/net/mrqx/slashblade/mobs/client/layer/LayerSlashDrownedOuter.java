@@ -7,12 +7,9 @@ import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.entity.RenderLayerParent;
 import net.minecraft.client.renderer.entity.layers.RenderLayer;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
 import net.mrqx.slashblade.mobs.client.model.ModelSlashDrowned;
 import net.mrqx.slashblade.mobs.entity.EntitySlashDrowned;
 
-@OnlyIn(Dist.CLIENT)
 public class LayerSlashDrownedOuter extends RenderLayer<EntitySlashDrowned, ModelSlashDrowned<EntitySlashDrowned>> {
     private static final ResourceLocation DROWNED_OUTER_LAYER_LOCATION = ResourceLocation.parse("textures/entity/zombie/drowned_outer_layer.png");
     private final ModelSlashDrowned<EntitySlashDrowned> model;
@@ -23,7 +20,33 @@ public class LayerSlashDrownedOuter extends RenderLayer<EntitySlashDrowned, Mode
     }
     
     @Override
-    public void render(PoseStack poseStack, MultiBufferSource buffer, int packedLight, EntitySlashDrowned livingEntity, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch) {
-        coloredCutoutModelCopyLayerRender(this.getParentModel(), this.model, DROWNED_OUTER_LAYER_LOCATION, poseStack, buffer, packedLight, livingEntity, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch, partialTicks, 1.0F, 1.0F, 1.0F);
+    public void render(
+        PoseStack poseStack,
+        MultiBufferSource bufferSource,
+        int packedLight,
+        EntitySlashDrowned livingEntity,
+        float limbSwing,
+        float limbSwingAmount,
+        float partialTick,
+        float ageInTicks,
+        float netHeadYaw,
+        float headPitch
+    ) {
+        coloredCutoutModelCopyLayerRender(
+            this.getParentModel(),
+            this.model,
+            DROWNED_OUTER_LAYER_LOCATION,
+            poseStack,
+            bufferSource,
+            packedLight,
+            livingEntity,
+            limbSwing,
+            limbSwingAmount,
+            ageInTicks,
+            netHeadYaw,
+            headPitch,
+            partialTick,
+            -1
+        );
     }
 }

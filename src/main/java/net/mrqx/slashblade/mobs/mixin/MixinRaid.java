@@ -15,7 +15,7 @@ public abstract class MixinRaid {
     @Inject(method = "getPotentialBonusSpawns(Lnet/minecraft/world/entity/raid/Raid$RaiderType;Lnet/minecraft/util/RandomSource;ILnet/minecraft/world/DifficultyInstance;Z)I", at = @At("HEAD"), cancellable = true)
     private void injectGetPotentialBonusSpawns(Raid.RaiderType raiderType, RandomSource random, int wave,
                                                DifficultyInstance difficulty, boolean shouldSpawnBonusGroup, CallbackInfoReturnable<Integer> cir) {
-        if (raiderType.equals(SlashBladeMobs.SLASH_ILLAGER_RAIDER_TYPE) && wave >= 3) {
+        if (raiderType.equals(SlashBladeMobs.SLASH_ILLAGER_RAIDER_TYPE_ENUM_PROXY.getValue()) && wave >= 3) {
             if (difficulty.getDifficulty() == Difficulty.EASY) {
                 cir.setReturnValue(random.nextInt(2));
             } else if (difficulty.getDifficulty() == Difficulty.NORMAL) {

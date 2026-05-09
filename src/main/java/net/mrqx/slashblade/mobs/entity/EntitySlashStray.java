@@ -1,7 +1,7 @@
 package net.mrqx.slashblade.mobs.entity;
 
-import com.google.common.util.concurrent.AtomicDouble;
 import mods.flammpfeil.slashblade.SlashBlade;
+import mods.flammpfeil.slashblade.capability.slashblade.BladeStateAccess;
 import mods.flammpfeil.slashblade.data.builtin.SlashBladeBuiltInRegistry;
 import mods.flammpfeil.slashblade.item.ItemSlashBlade;
 import mods.flammpfeil.slashblade.registry.ComboStateRegistry;
@@ -45,7 +45,8 @@ public class EntitySlashStray extends Stray implements ISlashBladeEntity {
     public static AttributeSupplier.Builder createAttributes() {
         return Monster.createMonsterAttributes()
             .add(Attributes.ATTACK_DAMAGE, 0.0)
-            .add(Attributes.MOVEMENT_SPEED, 0.25);
+            .add(Attributes.MOVEMENT_SPEED, 0.25)
+            .add(Attributes.SWEEPING_DAMAGE_RATIO);
     }
     
     public static boolean checkSlashStraySpawnRules(EntityType<EntitySlashStray> stray, ServerLevelAccessor level, MobSpawnType spawnType, BlockPos pos, RandomSource random) {
@@ -67,7 +68,7 @@ public class EntitySlashStray extends Stray implements ISlashBladeEntity {
         int i = random.nextInt(20);
         Registry<SlashBladeDefinition> bladeRegistry = SlashBlade.getSlashBladeDefinitionRegistry(this.level());
         if (i < this.level().getDifficulty().getId()) {
-            this.setItemSlot(EquipmentSlot.MAINHAND, Objects.requireNonNull(bladeRegistry.get(SlashBladeBuiltInRegistry.YASHA.location())).getBlade());
+            this.setItemSlot(EquipmentSlot.MAINHAND, Objects.requireNonNull(bladeRegistry.get(SlashBladeBuiltInRegistry.YASHA.location())).getBlade(this.registryAccess()));
         } else {
             if (i < this.level().getDifficulty().getId() * 4) {
                 this.setItemSlot(EquipmentSlot.MAINHAND, SlashBladeItems.SLASHBLADE_SILVERBAMBOO.get().getDefaultInstance());
@@ -99,11 +100,11 @@ public class EntitySlashStray extends Stray implements ISlashBladeEntity {
     }
     
     @Override
-    public double getMeleeAttackRangeSqr(LivingEntity entity) {
-        AtomicDouble attackDistance = new AtomicDouble(super.getMeleeAttackRangeSqr(entity));
-        this.getMainHandItem().getCapability(ItemSlashBlade.BLADESTATE).ifPresent(state ->
-            attackDistance.set(TargetSelector.getResolvedReach(this)));
-        return attackDistance.get() * attackDistance.get();
+    public boolean isWithinMeleeAttackRange(LivingEntity entity) {
+        return BladeStateAccess.of(this.getMainHandItem()).map(state -> {
+            double reach = TargetSelector.getResolvedReach(this);
+            return this.distanceTo(entity) < reach * reach;
+        }).orElse(false);
     }
     
     @Override

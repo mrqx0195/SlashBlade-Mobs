@@ -2,18 +2,16 @@ package net.mrqx.slashblade.mobs.client;
 
 import net.minecraft.client.model.geom.ModelLayerLocation;
 import net.minecraft.client.model.geom.builders.LayerDefinition;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.client.event.EntityRenderersEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
 import net.mrqx.slashblade.mobs.SlashBladeMobs;
 import net.mrqx.slashblade.mobs.client.model.ModelSlashVillager;
 import net.mrqx.slashblade.mobs.client.renderer.*;
 import net.mrqx.slashblade.mobs.registy.SlashMobsEntities;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.neoforge.client.event.EntityRenderersEvent;
 
-@OnlyIn(Dist.CLIENT)
-@Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
+@EventBusSubscriber(Dist.CLIENT)
 public class ClientHandler {
     public static final ModelLayerLocation SLASH_VILLAGER = new ModelLayerLocation(SlashBladeMobs.prefix("slash_villager"), "main");
     

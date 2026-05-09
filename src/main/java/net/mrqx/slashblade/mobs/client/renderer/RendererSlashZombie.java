@@ -5,15 +5,12 @@ import net.minecraft.client.model.geom.ModelLayers;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.HumanoidMobRenderer;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
 import net.mrqx.sbr_core.animation.VanillaConvertedVmdAnimation;
 import net.mrqx.sbr_core.client.layer.LayerSlashEntityArmor;
 import net.mrqx.sbr_core.client.layer.LayerSlashEntityBlade;
 import net.mrqx.slashblade.mobs.client.model.ModelSlashHumanoidMobs;
 import net.mrqx.slashblade.mobs.entity.EntitySlashZombie;
 
-@OnlyIn(Dist.CLIENT)
 public class RendererSlashZombie extends HumanoidMobRenderer<EntitySlashZombie, ModelSlashHumanoidMobs<EntitySlashZombie>> {
     private static final ResourceLocation ZOMBIE_LOCATION = ResourceLocation.parse("textures/entity/zombie/zombie.png");
     
@@ -27,8 +24,8 @@ public class RendererSlashZombie extends HumanoidMobRenderer<EntitySlashZombie, 
     }
     
     @Override
-    protected void setupRotations(EntitySlashZombie entityLiving, PoseStack poseStack, float ageInTicks, float rotationYaw, float partialTicks) {
-        super.setupRotations(entityLiving, poseStack, ageInTicks, rotationYaw, partialTicks);
+    protected void setupRotations(EntitySlashZombie entityLiving, PoseStack poseStack, float ageInTicks, float rotationYaw, float partialTicks, float scale) {
+        super.setupRotations(entityLiving, poseStack, ageInTicks, rotationYaw, partialTicks, scale);
         VanillaConvertedVmdAnimation currentAnimation = entityLiving.getCurrentAnimation();
         if (currentAnimation != null) {
             currentAnimation.setTickDelta(partialTicks);

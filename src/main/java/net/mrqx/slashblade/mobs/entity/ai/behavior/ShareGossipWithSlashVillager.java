@@ -40,7 +40,7 @@ public class ShareGossipWithSlashVillager extends Behavior<Villager> {
     protected void start(ServerLevel level, Villager entity, long gameTime) {
         entity.getBrain().getMemory(MemoryModuleType.INTERACTION_TARGET).ifPresent(living -> {
             if (living instanceof EntitySlashVillager slashVillager) {
-                BehaviorUtils.lockGazeAndWalkToEachOther(entity, slashVillager, 0.5F);
+                BehaviorUtils.lockGazeAndWalkToEachOther(entity, slashVillager, 0.5F, 2);
             }
         });
     }
@@ -50,7 +50,7 @@ public class ShareGossipWithSlashVillager extends Behavior<Villager> {
         owner.getBrain().getMemory(MemoryModuleType.INTERACTION_TARGET).ifPresent(living -> {
             if (living instanceof EntitySlashVillager slashVillager) {
                 if (owner.distanceToSqr(slashVillager) < 5.0D) {
-                    BehaviorUtils.lockGazeAndWalkToEachOther(owner, slashVillager, 0.5F);
+                    BehaviorUtils.lockGazeAndWalkToEachOther(owner, slashVillager, 0.5F, 2);
                     slashVillager.gossip(owner, gameTime);
                 }
                 if (owner.hasExcessFood() && slashVillager.getOffhandItem().isEmpty()) {

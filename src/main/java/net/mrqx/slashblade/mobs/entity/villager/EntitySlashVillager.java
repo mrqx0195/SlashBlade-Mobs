@@ -1,13 +1,14 @@
 package net.mrqx.slashblade.mobs.entity.villager;
 
-import com.google.common.util.concurrent.AtomicDouble;
 import com.mojang.authlib.GameProfile;
 import com.mojang.serialization.DataResult;
 import com.mojang.serialization.Dynamic;
+import mods.flammpfeil.slashblade.RegistryEvents;
 import mods.flammpfeil.slashblade.SlashBlade;
 import mods.flammpfeil.slashblade.SlashBladeConfig;
-import mods.flammpfeil.slashblade.capability.concentrationrank.ConcentrationRankCapabilityProvider;
+import mods.flammpfeil.slashblade.capability.concentrationrank.CapabilityConcentrationRank;
 import mods.flammpfeil.slashblade.capability.concentrationrank.IConcentrationRank;
+import mods.flammpfeil.slashblade.capability.slashblade.BladeStateAccess;
 import mods.flammpfeil.slashblade.capability.slashblade.ISlashBladeState;
 import mods.flammpfeil.slashblade.data.builtin.SlashBladeBuiltInRegistry;
 import mods.flammpfeil.slashblade.data.tag.SlashBladeItemTags;
@@ -18,8 +19,11 @@ import mods.flammpfeil.slashblade.item.SwordType;
 import mods.flammpfeil.slashblade.registry.SlashBladeItems;
 import mods.flammpfeil.slashblade.registry.slashblade.SlashBladeDefinition;
 import mods.flammpfeil.slashblade.util.TargetSelector;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.core.Registry;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.data.models.blockstates.PropertyDispatch;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
@@ -61,11 +65,6 @@ import net.minecraft.world.item.trading.MerchantOffer;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.ServerLevelAccessor;
 import net.minecraft.world.phys.AABB;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.common.util.FakePlayer;
-import net.minecraftforge.event.AnvilUpdateEvent;
-import net.minecraftforge.event.ForgeEventFactory;
-import net.minecraftforge.event.entity.player.AnvilRepairEvent;
 import net.mrqx.sbr_core.animation.VanillaConvertedVmdAnimation;
 import net.mrqx.sbr_core.entity.ISlashBladeEntity;
 import net.mrqx.sbr_core.utils.JustSlashArtManager;
@@ -78,6 +77,11 @@ import net.mrqx.slashblade.mobs.entity.ai.goal.VillagerSlashGoal;
 import net.mrqx.slashblade.mobs.mixin.AccessorVillager;
 import net.mrqx.slashblade.mobs.registy.SlashMobsVillagerProfessions;
 import net.mrqx.slashblade.mobs.utils.SlashMobsUtils;
+import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.neoforge.common.util.FakePlayer;
+import net.neoforged.neoforge.event.AnvilUpdateEvent;
+import net.neoforged.neoforge.event.EventHooks;
+import net.neoforged.neoforge.event.entity.player.AnvilRepairEvent;
 
 import javax.annotation.Nullable;
 import java.util.List;
@@ -89,7 +93,7 @@ import java.util.function.BiFunction;
 @SuppressWarnings("DuplicatedCode")
 public class EntitySlashVillager extends AbstractVillager implements ISlashBladeEntity, NeutralMob, RangedAttackMob, VillagerDataHolder {
     private static final EntityDataAccessor<VillagerData> DATA_VILLAGER_DATA = SynchedEntityData.defineId(EntitySlashVillager.class, EntityDataSerializers.VILLAGER_DATA);
-    public static final UUID SLASH_VILLAGER_ARMOR_MODIFIER = UUID.fromString("172608B9-4A42-4493-B1DB-215889A10B05");
+    public static final ResourceLocation SLASH_VILLAGER_ARMOR_MODIFIER = SlashBladeMobs.prefix("slash_villager_armor_modifier");
     @Nullable
     public VanillaConvertedVmdAnimation currentAnimation;
     private int villagerXp;
@@ -127,7 +131,7 @@ public class EntitySlashVillager extends AbstractVillager implements ISlashBlade
             fakePlayer = null;
         }
         this.setVillagerData(this.getVillagerData().setType(villagerType));
-        bladeStand = new SlashVillagerFakeBladeStand(SlashBlade.RegistryEvents.BladeStand, level);
+        bladeStand = new SlashVillagerFakeBladeStand(RegistryEvents.BladeStand, level);
         this.xpReward *= 2;
     }
     
@@ -140,7 +144,8 @@ public class EntitySlashVillager extends AbstractVillager implements ISlashBlade
             .add(Attributes.MOVEMENT_SPEED, 0.5)
             .add(Attributes.ATTACK_DAMAGE, 0.0)
             .add(Attributes.ARMOR, 5.0)
-            .add(Attributes.FOLLOW_RANGE, 48.0);
+            .add(Attributes.FOLLOW_RANGE, 48.0)
+            .add(Attributes.SWEEPING_DAMAGE_RATIO);
     }
     
     @Override
@@ -189,7 +194,7 @@ public class EntitySlashVillager extends AbstractVillager implements ISlashBlade
         if (armorAttribute != null) {
             armorAttribute.removeModifier(SLASH_VILLAGER_ARMOR_MODIFIER);
             armorAttribute.addPermanentModifier(new AttributeModifier(SLASH_VILLAGER_ARMOR_MODIFIER,
-                "SlashVillager Armor Modifier", this.getVillagerData().getLevel() * 3, AttributeModifier.Operation.ADDITION));
+                this.getVillagerData().getLevel() * 3, AttributeModifier.Operation.ADD_VALUE));
         }
         
         if (this.getItemInHand(InteractionHand.MAIN_HAND).getItem() instanceof ItemSlashBlade) {
@@ -226,7 +231,7 @@ public class EntitySlashVillager extends AbstractVillager implements ISlashBlade
                     this.addEffect(new MobEffectInstance(MobEffects.REGENERATION, 1200, 1));
                 }
             }
-            this.getMainHandItem().getCapability(ItemSlashBlade.BLADESTATE).ifPresent(state -> state.setDamage(state.getDamage() - 1));
+            BladeStateAccess.of(this.getMainHandItem()).ifPresent(state -> state.setDamage(state.getDamage() - 1));
         } else if (this.getTarget() != null && this.getTarget().isAlive()) {
             SlashVillagerProfessionSettings professionSettings = this.getSlashVillagerProfessionSettings();
             if (professionSettings != null) {
@@ -278,14 +283,12 @@ public class EntitySlashVillager extends AbstractVillager implements ISlashBlade
     public boolean killedEntity(ServerLevel level, LivingEntity entity) {
         ItemStack stack = this.getMainHandItem();
         if (!stack.isEmpty()) {
-            if (stack.getCapability(ItemSlashBlade.BLADESTATE).isPresent()) {
-                IConcentrationRank.ConcentrationRanks rankBonus = this.getCapability(ConcentrationRankCapabilityProvider.RANK_POINT)
-                    .map((rp) -> rp.getRank(this.level().getGameTime()))
-                    .orElse(IConcentrationRank.ConcentrationRanks.NONE);
-                int souls = (int) Math.floor(entity.getExperienceReward() * (1 + rankBonus.level * 0.1));
-                stack.getCapability(ItemSlashBlade.BLADESTATE).ifPresent((state) -> {
+            if (BladeStateAccess.of(stack).isPresent()) {
+                IConcentrationRank.ConcentrationRanks rankBonus = this.getData(CapabilityConcentrationRank.RANK_POINT).getRank(this.level().getGameTime());
+                int souls = (int) Math.floor(entity.getExperienceReward(level, this) * (1 + rankBonus.level * 0.1));
+                BladeStateAccess.of(stack).ifPresent((state) -> {
                     SlashBladeEvent.AddProudSoulEvent soulEvent = new SlashBladeEvent.AddProudSoulEvent(stack, state, Math.min(SlashBladeConfig.MAX_PROUD_SOUL_GOT.get(), souls));
-                    MinecraftForge.EVENT_BUS.post(soulEvent);
+                    NeoForge.EVENT_BUS.post(soulEvent);
                     int newCount = soulEvent.getNewCount();
                     state.setProudSoulCount(state.getProudSoulCount() + newCount);
                     if (SwordType.from(stack).contains(SwordType.SOULEATER)) {
@@ -304,15 +307,15 @@ public class EntitySlashVillager extends AbstractVillager implements ISlashBlade
         if (this.level() instanceof ServerLevel && this.fakePlayer != null) {
             ItemStack copy = item.copy();
             AnvilUpdateEvent updateEvent = new AnvilUpdateEvent(blade, copy, blade.getHoverName().toString(),
-                blade.getBaseRepairCost() + (copy.isEmpty() ? 0 : copy.getBaseRepairCost()), this.fakePlayer);
-            if (!MinecraftForge.EVENT_BUS.post(updateEvent) && !updateEvent.getOutput().isEmpty()) {
+                blade.getOrDefault(DataComponents.REPAIR_COST, 0) + (copy.isEmpty() ? 0 : copy.getOrDefault(DataComponents.REPAIR_COST, 0)), this.fakePlayer);
+            if (!NeoForge.EVENT_BUS.post(updateEvent).isCanceled() && !updateEvent.getOutput().isEmpty()) {
                 ItemStack output = updateEvent.getOutput();
                 copy.setCount(copy.getCount() - updateEvent.getMaterialCost());
-                int proudSoulCount = Math.max(output.getCapability(ItemSlashBlade.BLADESTATE).map(ISlashBladeState::getProudSoulCount).orElse(0)
-                    - blade.getCapability(ItemSlashBlade.BLADESTATE).map(ISlashBladeState::getProudSoulCount).orElse(0), 0);
+                int proudSoulCount = Math.max(BladeStateAccess.of(output).map(ISlashBladeState::getProudSoulCount).orElse(0)
+                    - BladeStateAccess.of(blade).map(ISlashBladeState::getProudSoulCount).orElse(0), 0);
                 this.setItemInHand(InteractionHand.MAIN_HAND, output);
                 AnvilRepairEvent repairEvent = new AnvilRepairEvent(this.fakePlayer, blade, copy, output);
-                MinecraftForge.EVENT_BUS.post(repairEvent);
+                NeoForge.EVENT_BUS.post(repairEvent);
                 this.rewardXp(proudSoulCount / 100);
             }
             
@@ -320,10 +323,10 @@ public class EntitySlashVillager extends AbstractVillager implements ISlashBlade
             ItemStack copy1 = item.copy();
             this.fakePlayer.setItemInHand(InteractionHand.MAIN_HAND, copy1);
             this.bladeStand.setItem(blade1.copy());
-            blade1.getCapability(ItemSlashBlade.BLADESTATE).ifPresent(state -> {
+            BladeStateAccess.of(blade1).ifPresent(state -> {
                 SlashBladeEvent.BladeStandAttackEvent attackEvent = new SlashBladeEvent.BladeStandAttackEvent(blade1, state, this.bladeStand,
                     this.level().damageSources().playerAttack(this.fakePlayer));
-                MinecraftForge.EVENT_BUS.post(attackEvent);
+                NeoForge.EVENT_BUS.post(attackEvent);
                 this.setItemInHand(InteractionHand.MAIN_HAND, attackEvent.getBlade());
             });
             copy1 = this.fakePlayer.getMainHandItem();
@@ -348,9 +351,9 @@ public class EntitySlashVillager extends AbstractVillager implements ISlashBlade
     }
     
     @Override
-    protected void defineSynchedData() {
-        super.defineSynchedData();
-        this.entityData.define(DATA_VILLAGER_DATA, new VillagerData(VillagerType.PLAINS, SlashMobsVillagerProfessions.SLASHBLADE_SAMURAI_A.get(), 1));
+    protected void defineSynchedData(SynchedEntityData.Builder builder) {
+        super.defineSynchedData(builder);
+        builder.define(DATA_VILLAGER_DATA, new VillagerData(VillagerType.PLAINS, SlashMobsVillagerProfessions.SLASHBLADE_SAMURAI_A.get(), 1));
     }
     
     @Override
@@ -387,7 +390,7 @@ public class EntitySlashVillager extends AbstractVillager implements ISlashBlade
     }
     
     @Override
-    public SpawnGroupData finalizeSpawn(ServerLevelAccessor worldIn, DifficultyInstance difficultyIn, MobSpawnType reason, @Nullable SpawnGroupData spawnDataIn, @Nullable CompoundTag dataTag) {
+    public SpawnGroupData finalizeSpawn(ServerLevelAccessor worldIn, DifficultyInstance difficultyIn, MobSpawnType reason, @Nullable SpawnGroupData spawnDataIn) {
         VillagerProfession profession;
         RandomSource randomSource = worldIn.getRandom();
         switch (randomSource.nextInt(3)) {
@@ -398,8 +401,8 @@ public class EntitySlashVillager extends AbstractVillager implements ISlashBlade
         this.setVillagerData(this.getVillagerData().setProfession(profession));
         this.setPersistenceRequired();
         this.populateDefaultEquipmentSlots(randomSource, difficultyIn);
-        this.populateDefaultEquipmentEnchantments(randomSource, difficultyIn);
-        return super.finalizeSpawn(worldIn, difficultyIn, reason, spawnDataIn, dataTag);
+        this.populateDefaultEquipmentEnchantments(worldIn, randomSource, difficultyIn);
+        return super.finalizeSpawn(worldIn, difficultyIn, reason, spawnDataIn);
     }
     
     @Override
@@ -408,18 +411,18 @@ public class EntitySlashVillager extends AbstractVillager implements ISlashBlade
         this.handDropChances[EquipmentSlot.MAINHAND.getIndex()] = 100.0F;
         this.handDropChances[EquipmentSlot.OFFHAND.getIndex()] = 100.0F;
         Registry<SlashBladeDefinition> bladeRegistry = SlashBlade.getSlashBladeDefinitionRegistry(this.level());
-        this.setItemSlot(EquipmentSlot.MAINHAND, getDefaultBladeForVillagerLevel(bladeRegistry, this.getVillagerData().getLevel()));
+        this.setItemSlot(EquipmentSlot.MAINHAND, getDefaultBladeForVillagerLevel(bladeRegistry, this.getVillagerData().getLevel(), this.registryAccess()));
         this.refreshBlade();
     }
     
     public void refreshBlade() {
         Registry<SlashBladeDefinition> bladeRegistry = SlashBlade.getSlashBladeDefinitionRegistry(this.level());
-        ItemStack newBlade = EntitySlashVillager.getDefaultBladeForVillagerLevel(bladeRegistry, this.getVillagerData().getLevel());
+        ItemStack newBlade = EntitySlashVillager.getDefaultBladeForVillagerLevel(bladeRegistry, this.getVillagerData().getLevel(), this.registryAccess());
         ItemStack oldBlade = this.getMainHandItem();
         SlashMobsUtils.restoreBladeData(newBlade, oldBlade);
         SlashVillagerProfessionSettings professionSettings = this.getSlashVillagerProfessionSettings();
         if (professionSettings != null) {
-            SlashMobsUtils.setNewBladeEnchantments(oldBlade, professionSettings, newBlade);
+            SlashMobsUtils.setNewBladeEnchantments(oldBlade, professionSettings, newBlade, this.registryAccess().lookupOrThrow(Registries.ENCHANTMENT));
         }
         this.setItemInHand(InteractionHand.MAIN_HAND, newBlade);
         this.onPickupProudSoul(SlashBladeItems.PROUDSOUL_TRAPEZOHEDRON.get().getDefaultInstance());
@@ -522,27 +525,27 @@ public class EntitySlashVillager extends AbstractVillager implements ISlashBlade
         }
     }
     
-    public static ItemStack getDefaultBladeForVillagerLevel(Registry<SlashBladeDefinition> bladeRegistry, int level) {
+    public static ItemStack getDefaultBladeForVillagerLevel(Registry<SlashBladeDefinition> bladeRegistry, int level, HolderLookup.Provider registries) {
         return switch (level) {
             case 1 ->
-                Objects.requireNonNull(bladeRegistry.get(SlashBladeBuiltInRegistry.RODAI_WOODEN.location())).getBlade();
+                Objects.requireNonNull(bladeRegistry.get(SlashBladeBuiltInRegistry.RODAI_WOODEN.location())).getBlade(registries);
             case 2 ->
-                Objects.requireNonNull(bladeRegistry.get(SlashBladeBuiltInRegistry.RODAI_STONE.location())).getBlade();
+                Objects.requireNonNull(bladeRegistry.get(SlashBladeBuiltInRegistry.RODAI_STONE.location())).getBlade(registries);
             case 3 ->
-                Objects.requireNonNull(bladeRegistry.get(SlashBladeBuiltInRegistry.RODAI_IRON.location())).getBlade();
+                Objects.requireNonNull(bladeRegistry.get(SlashBladeBuiltInRegistry.RODAI_IRON.location())).getBlade(registries);
             case 4 ->
-                Objects.requireNonNull(bladeRegistry.get(SlashBladeBuiltInRegistry.RODAI_GOLDEN.location())).getBlade();
+                Objects.requireNonNull(bladeRegistry.get(SlashBladeBuiltInRegistry.RODAI_GOLDEN.location())).getBlade(registries);
             default ->
-                Objects.requireNonNull(bladeRegistry.get(SlashBladeBuiltInRegistry.RODAI_DIAMOND.location())).getBlade();
+                Objects.requireNonNull(bladeRegistry.get(SlashBladeBuiltInRegistry.RODAI_DIAMOND.location())).getBlade(registries);
         };
     }
     
     @Override
-    public double getMeleeAttackRangeSqr(LivingEntity entity) {
-        AtomicDouble attackDistance = new AtomicDouble(super.getMeleeAttackRangeSqr(entity));
-        this.getMainHandItem().getCapability(ItemSlashBlade.BLADESTATE).ifPresent(state ->
-            attackDistance.set(TargetSelector.getResolvedReach(this)));
-        return attackDistance.get() * attackDistance.get();
+    public boolean isWithinMeleeAttackRange(LivingEntity entity) {
+        return BladeStateAccess.of(this.getMainHandItem()).map(state -> {
+            double reach = TargetSelector.getResolvedReach(this);
+            return this.distanceTo(entity) < reach * reach;
+        }).orElse(false);
     }
     
     @Override
@@ -598,7 +601,7 @@ public class EntitySlashVillager extends AbstractVillager implements ISlashBlade
         targetList.removeIf(entity -> !(entity instanceof Mob && entity instanceof Enemy));
         targetList.removeIf(entity -> SlashBladeMobCompat.Factories.getSlashVillagerIgnores().stream().anyMatch(clazz -> clazz.isInstance(entity)));
         
-        attacker.getMainHandItem().getCapability(ItemSlashBlade.BLADESTATE).ifPresent(state -> {
+        BladeStateAccess.of(attacker.getMainHandItem()).ifPresent(state -> {
             Entity target = state.getTargetEntity(world);
             if (target != null) {
                 targetList.add(target);
@@ -654,14 +657,14 @@ public class EntitySlashVillager extends AbstractVillager implements ISlashBlade
     
     @Override
     public void thunderHit(ServerLevel level, LightningBolt lightning) {
-        if (level.getDifficulty() != Difficulty.PEACEFUL && ForgeEventFactory.canLivingConvert(this, EntityType.WITCH, (timer) -> {
+        if (level.getDifficulty() != Difficulty.PEACEFUL && EventHooks.canLivingConvert(this, EntityType.WITCH, (timer) -> {
         })) {
             Witch witch = EntityType.WITCH.create(level);
             if (witch == null) {
                 return;
             }
             witch.copyPosition(this);
-            witch.finalizeSpawn(level, level.getCurrentDifficultyAt(witch.blockPosition()), MobSpawnType.CONVERSION, null, null);
+            witch.finalizeSpawn(level, level.getCurrentDifficultyAt(witch.blockPosition()), MobSpawnType.CONVERSION, null);
             witch.setNoAi(this.isNoAi());
             witch.setCustomName(this.getCustomName());
             witch.setCustomNameVisible(this.isCustomNameVisible());

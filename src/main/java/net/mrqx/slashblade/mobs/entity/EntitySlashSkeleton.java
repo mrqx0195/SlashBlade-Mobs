@@ -1,6 +1,6 @@
 package net.mrqx.slashblade.mobs.entity;
 
-import com.google.common.util.concurrent.AtomicDouble;
+import mods.flammpfeil.slashblade.capability.slashblade.BladeStateAccess;
 import mods.flammpfeil.slashblade.item.ItemSlashBlade;
 import mods.flammpfeil.slashblade.registry.ComboStateRegistry;
 import mods.flammpfeil.slashblade.registry.SlashBladeItems;
@@ -42,7 +42,8 @@ public class EntitySlashSkeleton extends Skeleton implements ISlashBladeEntity {
     public static AttributeSupplier.Builder createAttributes() {
         return Monster.createMonsterAttributes()
             .add(Attributes.ATTACK_DAMAGE, 0.0)
-            .add(Attributes.MOVEMENT_SPEED, 0.25);
+            .add(Attributes.MOVEMENT_SPEED, 0.25)
+            .add(Attributes.SWEEPING_DAMAGE_RATIO);
     }
     
     @Override
@@ -110,11 +111,11 @@ public class EntitySlashSkeleton extends Skeleton implements ISlashBladeEntity {
     }
     
     @Override
-    public double getMeleeAttackRangeSqr(LivingEntity entity) {
-        AtomicDouble attackDistance = new AtomicDouble(super.getMeleeAttackRangeSqr(entity));
-        this.getMainHandItem().getCapability(ItemSlashBlade.BLADESTATE).ifPresent(state ->
-            attackDistance.set(TargetSelector.getResolvedReach(this)));
-        return attackDistance.get() * attackDistance.get();
+    public boolean isWithinMeleeAttackRange(LivingEntity entity) {
+        return BladeStateAccess.of(this.getMainHandItem()).map(state -> {
+            double reach = TargetSelector.getResolvedReach(this);
+            return this.distanceTo(entity) < reach * reach;
+        }).orElse(false);
     }
     
     @Override

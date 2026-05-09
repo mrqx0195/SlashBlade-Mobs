@@ -1,14 +1,14 @@
 package net.mrqx.slashblade.mobs.entity.villager;
 
-import com.google.common.collect.Maps;
-import com.google.common.util.concurrent.AtomicDouble;
 import com.mojang.authlib.GameProfile;
 import com.mojang.serialization.DataResult;
 import com.mojang.serialization.Dynamic;
+import mods.flammpfeil.slashblade.RegistryEvents;
 import mods.flammpfeil.slashblade.SlashBlade;
 import mods.flammpfeil.slashblade.SlashBladeConfig;
-import mods.flammpfeil.slashblade.capability.concentrationrank.ConcentrationRankCapabilityProvider;
+import mods.flammpfeil.slashblade.capability.concentrationrank.CapabilityConcentrationRank;
 import mods.flammpfeil.slashblade.capability.concentrationrank.IConcentrationRank;
+import mods.flammpfeil.slashblade.capability.slashblade.BladeStateAccess;
 import mods.flammpfeil.slashblade.capability.slashblade.ISlashBladeState;
 import mods.flammpfeil.slashblade.data.tag.SlashBladeItemTags;
 import mods.flammpfeil.slashblade.entity.BladeStandEntity;
@@ -19,6 +19,9 @@ import mods.flammpfeil.slashblade.registry.SlashBladeItems;
 import mods.flammpfeil.slashblade.registry.slashblade.SlashBladeDefinition;
 import mods.flammpfeil.slashblade.util.TargetSelector;
 import net.minecraft.core.Registry;
+import net.minecraft.core.RegistryAccess;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.data.models.blockstates.PropertyDispatch;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtOps;
@@ -30,6 +33,7 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
+import net.minecraft.tags.EntityTypeTags;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.Difficulty;
 import net.minecraft.world.DifficultyInstance;
@@ -57,16 +61,12 @@ import net.minecraft.world.entity.npc.*;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.raid.Raider;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.item.enchantment.Enchantments;
+import net.minecraft.world.item.enchantment.ItemEnchantments;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.ServerLevelAccessor;
 import net.minecraft.world.phys.AABB;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.common.util.FakePlayer;
-import net.minecraftforge.event.AnvilUpdateEvent;
-import net.minecraftforge.event.entity.player.AnvilRepairEvent;
 import net.mrqx.sbr_core.animation.VanillaConvertedVmdAnimation;
 import net.mrqx.sbr_core.entity.ISlashBladeEntity;
 import net.mrqx.sbr_core.utils.JustSlashArtManager;
@@ -77,10 +77,13 @@ import net.mrqx.slashblade.mobs.entity.ai.goal.VillagerMirageBladeGoal;
 import net.mrqx.slashblade.mobs.entity.ai.goal.VillagerSlashGoal;
 import net.mrqx.slashblade.mobs.registy.SlashMobsVillagerProfessions;
 import net.mrqx.slashblade.mobs.utils.SlashMobsUtils;
+import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.neoforge.common.util.FakePlayer;
+import net.neoforged.neoforge.event.AnvilUpdateEvent;
+import net.neoforged.neoforge.event.entity.player.AnvilRepairEvent;
 
 import javax.annotation.Nullable;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.function.BiFunction;
@@ -112,7 +115,7 @@ public class EntitySlashIllager extends AbstractIllager implements ISlashBladeEn
         } else {
             fakePlayer = null;
         }
-        bladeStand = new SlashVillagerFakeBladeStand(SlashBlade.RegistryEvents.BladeStand, level);
+        bladeStand = new SlashVillagerFakeBladeStand(RegistryEvents.BladeStand, level);
         this.xpReward *= 2;
     }
     
@@ -142,13 +145,14 @@ public class EntitySlashIllager extends AbstractIllager implements ISlashBladeEn
             .add(Attributes.MAX_HEALTH, 20.0)
             .add(Attributes.ATTACK_DAMAGE, 1.0)
             .add(Attributes.ARMOR, 5.0)
-            .add(Attributes.FOLLOW_RANGE, 32.0);
+            .add(Attributes.FOLLOW_RANGE, 32.0)
+            .add(Attributes.SWEEPING_DAMAGE_RATIO);
     }
     
     @Override
-    protected void defineSynchedData() {
-        super.defineSynchedData();
-        this.entityData.define(DATA_VILLAGER_DATA, new VillagerData(VillagerType.PLAINS, SlashMobsVillagerProfessions.SLASHBLADE_SAMURAI_A.get(), 1));
+    protected void defineSynchedData(SynchedEntityData.Builder builder) {
+        super.defineSynchedData(builder);
+        builder.define(DATA_VILLAGER_DATA, new VillagerData(VillagerType.PLAINS, SlashMobsVillagerProfessions.SLASHBLADE_SAMURAI_A.get(), 1));
     }
     
     @Override
@@ -194,8 +198,8 @@ public class EntitySlashIllager extends AbstractIllager implements ISlashBladeEn
     
     @Override
     @Nullable
-    public SpawnGroupData finalizeSpawn(ServerLevelAccessor level, DifficultyInstance difficulty, MobSpawnType reason, @Nullable SpawnGroupData spawnData, @Nullable CompoundTag dataTag) {
-        SpawnGroupData spawngroupdata = super.finalizeSpawn(level, difficulty, reason, spawnData, dataTag);
+    public SpawnGroupData finalizeSpawn(ServerLevelAccessor level, DifficultyInstance difficulty, MobSpawnType reason, @Nullable SpawnGroupData spawnData) {
+        SpawnGroupData spawngroupdata = super.finalizeSpawn(level, difficulty, reason, spawnData);
         ((GroundPathNavigation) this.getNavigation()).setCanOpenDoors(true);
         RandomSource randomsource = level.getRandom();
         VillagerProfession profession;
@@ -206,7 +210,7 @@ public class EntitySlashIllager extends AbstractIllager implements ISlashBladeEn
         }
         this.setVillagerData(this.getVillagerData().setProfession(profession).setLevel(randomsource.nextInt(5) + 1));
         this.populateDefaultEquipmentSlots(randomsource, difficulty);
-        this.populateDefaultEquipmentEnchantments(randomsource, difficulty);
+        this.populateDefaultEquipmentEnchantments(level, randomsource, difficulty);
         return spawngroupdata;
     }
     
@@ -214,26 +218,26 @@ public class EntitySlashIllager extends AbstractIllager implements ISlashBladeEn
     protected void populateDefaultEquipmentSlots(RandomSource random, DifficultyInstance difficulty) {
         if (this.getCurrentRaid() == null) {
             ItemStack stack = new ItemStack(SlashBladeItems.SLASHBLADE.get());
-            Map<Enchantment, Integer> map = Maps.newHashMap();
-            map.put(Enchantments.SWEEPING_EDGE, 1);
-            EnchantmentHelper.setEnchantments(map, stack);
+            ItemEnchantments.Mutable enchantments = new ItemEnchantments.Mutable(ItemEnchantments.EMPTY);
+            enchantments.set(this.registryAccess().holderOrThrow(Enchantments.SWEEPING_EDGE), 1);
+            EnchantmentHelper.setEnchantments(stack, enchantments.toImmutable());
             this.setItemSlot(EquipmentSlot.MAINHAND, stack);
         }
         this.handDropChances[EquipmentSlot.MAINHAND.getIndex()] = 100.0F;
         this.handDropChances[EquipmentSlot.OFFHAND.getIndex()] = 100.0F;
         Registry<SlashBladeDefinition> bladeRegistry = SlashBlade.getSlashBladeDefinitionRegistry(this.level());
-        this.setItemSlot(EquipmentSlot.MAINHAND, EntitySlashVillager.getDefaultBladeForVillagerLevel(bladeRegistry, this.getVillagerData().getLevel()));
+        this.setItemSlot(EquipmentSlot.MAINHAND, EntitySlashVillager.getDefaultBladeForVillagerLevel(bladeRegistry, this.getVillagerData().getLevel(), this.registryAccess()));
         this.refreshBlade();
     }
     
     public void refreshBlade() {
         Registry<SlashBladeDefinition> bladeRegistry = SlashBlade.getSlashBladeDefinitionRegistry(this.level());
-        ItemStack newBlade = EntitySlashVillager.getDefaultBladeForVillagerLevel(bladeRegistry, this.getVillagerData().getLevel());
+        ItemStack newBlade = EntitySlashVillager.getDefaultBladeForVillagerLevel(bladeRegistry, this.getVillagerData().getLevel(), this.registryAccess());
         ItemStack oldBlade = this.getMainHandItem();
         SlashMobsUtils.restoreBladeData(newBlade, oldBlade);
         SlashVillagerProfessionSettings professionSettings = this.getSlashVillagerProfessionSettings();
         if (professionSettings != null) {
-            SlashMobsUtils.setNewBladeEnchantments(oldBlade, professionSettings, newBlade);
+            SlashMobsUtils.setNewBladeEnchantments(oldBlade, professionSettings, newBlade, this.registryAccess().lookupOrThrow(Registries.ENCHANTMENT));
         }
         this.setItemInHand(InteractionHand.MAIN_HAND, newBlade);
         this.onPickupProudSoul(SlashBladeItems.PROUDSOUL_TRAPEZOHEDRON.get().getDefaultInstance());
@@ -246,16 +250,17 @@ public class EntitySlashIllager extends AbstractIllager implements ISlashBladeEn
     }
     
     @Override
-    public void applyRaidBuffs(int wave, boolean unusedFalse) {
+    public void applyRaidBuffs(ServerLevel level, int wave, boolean unusedFalse) {
         ItemStack stack = new ItemStack(SlashBladeItems.SLASHBLADE.get());
-        Map<Enchantment, Integer> map = Maps.newHashMap();
+        ItemEnchantments.Mutable enchantments = new ItemEnchantments.Mutable(ItemEnchantments.EMPTY);
+        RegistryAccess registryAccess = level.registryAccess();
         if (this.raid != null && wave > this.raid.getNumGroups(Difficulty.NORMAL)) {
-            map.put(Enchantments.SHARPNESS, 2);
+            enchantments.set(registryAccess.holderOrThrow(Enchantments.SHARPNESS), 2);
         }
         if (this.random.nextFloat() < 0.1F) {
-            map.put(Enchantments.SWEEPING_EDGE, 1);
+            enchantments.set(registryAccess.holderOrThrow(Enchantments.SWEEPING_EDGE), 1);
         }
-        EnchantmentHelper.setEnchantments(map, stack);
+        EnchantmentHelper.setEnchantments(stack, enchantments.toImmutable());
         this.setItemSlot(EquipmentSlot.MAINHAND, stack);
         this.setVillagerData(this.getVillagerData().setLevel(Math.min(wave - 2, 5)));
         this.refreshBlade();
@@ -270,7 +275,7 @@ public class EntitySlashIllager extends AbstractIllager implements ISlashBladeEn
     public boolean isAlliedTo(Entity entity) {
         if (super.isAlliedTo(entity)) {
             return true;
-        } else if (entity instanceof LivingEntity livingEntity && livingEntity.getMobType().equals(MobType.ILLAGER)) {
+        } else if (entity.getType().is(EntityTypeTags.ILLAGER_FRIENDS)) {
             return this.getTeam() == null && entity.getTeam() == null;
         } else {
             return false;
@@ -293,7 +298,7 @@ public class EntitySlashIllager extends AbstractIllager implements ISlashBladeEn
         if (armorAttribute != null) {
             armorAttribute.removeModifier(EntitySlashVillager.SLASH_VILLAGER_ARMOR_MODIFIER);
             armorAttribute.addPermanentModifier(new AttributeModifier(EntitySlashVillager.SLASH_VILLAGER_ARMOR_MODIFIER,
-                "SlashVillager Armor Modifier", this.getVillagerData().getLevel() * 3, AttributeModifier.Operation.ADDITION));
+                this.getVillagerData().getLevel() * 3, AttributeModifier.Operation.ADD_VALUE));
         }
         
         if (this.getItemInHand(InteractionHand.MAIN_HAND).getItem() instanceof ItemSlashBlade) {
@@ -318,7 +323,7 @@ public class EntitySlashIllager extends AbstractIllager implements ISlashBladeEn
     protected void customServerAiStep() {
         super.customServerAiStep();
         if (!this.isAggressive()) {
-            this.getMainHandItem().getCapability(ItemSlashBlade.BLADESTATE).ifPresent(state -> state.setDamage(state.getDamage() - 1));
+            BladeStateAccess.of(this.getMainHandItem()).ifPresent(state -> state.setDamage(state.getDamage() - 1));
         } else if (this.getTarget() != null && this.getTarget().isAlive()) {
             SlashVillagerProfessionSettings professionSettings = this.getSlashVillagerProfessionSettings();
             if (professionSettings != null) {
@@ -370,14 +375,12 @@ public class EntitySlashIllager extends AbstractIllager implements ISlashBladeEn
     public boolean killedEntity(ServerLevel level, LivingEntity entity) {
         ItemStack stack = this.getMainHandItem();
         if (!stack.isEmpty()) {
-            if (stack.getCapability(ItemSlashBlade.BLADESTATE).isPresent()) {
-                IConcentrationRank.ConcentrationRanks rankBonus = this.getCapability(ConcentrationRankCapabilityProvider.RANK_POINT)
-                    .map((rp) -> rp.getRank(this.level().getGameTime()))
-                    .orElse(IConcentrationRank.ConcentrationRanks.NONE);
-                int souls = (int) Math.floor(entity.getExperienceReward() * (1 + rankBonus.level * 0.1));
-                stack.getCapability(ItemSlashBlade.BLADESTATE).ifPresent((state) -> {
+            if (BladeStateAccess.of(stack).isPresent()) {
+                IConcentrationRank.ConcentrationRanks rankBonus = this.getData(CapabilityConcentrationRank.RANK_POINT).getRank(this.level().getGameTime());
+                int souls = (int) Math.floor(entity.getExperienceReward(level, this) * (1 + rankBonus.level * 0.1));
+                BladeStateAccess.of(stack).ifPresent((state) -> {
                     SlashBladeEvent.AddProudSoulEvent soulEvent = new SlashBladeEvent.AddProudSoulEvent(stack, state, Math.min(SlashBladeConfig.MAX_PROUD_SOUL_GOT.get(), souls));
-                    MinecraftForge.EVENT_BUS.post(soulEvent);
+                    NeoForge.EVENT_BUS.post(soulEvent);
                     int newCount = soulEvent.getNewCount();
                     state.setProudSoulCount(state.getProudSoulCount() + newCount);
                     if (SwordType.from(stack).contains(SwordType.SOULEATER)) {
@@ -396,15 +399,15 @@ public class EntitySlashIllager extends AbstractIllager implements ISlashBladeEn
         if (this.level() instanceof ServerLevel && this.fakePlayer != null) {
             ItemStack copy = item.copy();
             AnvilUpdateEvent updateEvent = new AnvilUpdateEvent(blade, copy, blade.getHoverName().toString(),
-                blade.getBaseRepairCost() + (copy.isEmpty() ? 0 : copy.getBaseRepairCost()), this.fakePlayer);
-            if (!MinecraftForge.EVENT_BUS.post(updateEvent) && !updateEvent.getOutput().isEmpty()) {
+                blade.getOrDefault(DataComponents.REPAIR_COST, 0) + (copy.isEmpty() ? 0 : copy.getOrDefault(DataComponents.REPAIR_COST, 0)), this.fakePlayer);
+            if (!NeoForge.EVENT_BUS.post(updateEvent).isCanceled() && !updateEvent.getOutput().isEmpty()) {
                 ItemStack output = updateEvent.getOutput();
                 copy.setCount(copy.getCount() - updateEvent.getMaterialCost());
-                int proudSoulCount = Math.max(output.getCapability(ItemSlashBlade.BLADESTATE).map(ISlashBladeState::getProudSoulCount).orElse(0)
-                    - blade.getCapability(ItemSlashBlade.BLADESTATE).map(ISlashBladeState::getProudSoulCount).orElse(0), 0);
+                int proudSoulCount = Math.max(BladeStateAccess.of(output).map(ISlashBladeState::getProudSoulCount).orElse(0)
+                    - BladeStateAccess.of(blade).map(ISlashBladeState::getProudSoulCount).orElse(0), 0);
                 this.setItemInHand(InteractionHand.MAIN_HAND, output);
                 AnvilRepairEvent repairEvent = new AnvilRepairEvent(this.fakePlayer, blade, copy, output);
-                MinecraftForge.EVENT_BUS.post(repairEvent);
+                NeoForge.EVENT_BUS.post(repairEvent);
                 this.rewardXp(proudSoulCount / 100);
             }
             
@@ -412,10 +415,10 @@ public class EntitySlashIllager extends AbstractIllager implements ISlashBladeEn
             ItemStack copy1 = item.copy();
             this.fakePlayer.setItemInHand(InteractionHand.MAIN_HAND, copy1);
             this.bladeStand.setItem(blade1.copy());
-            blade1.getCapability(ItemSlashBlade.BLADESTATE).ifPresent(state -> {
+            BladeStateAccess.of(blade1).ifPresent(state -> {
                 SlashBladeEvent.BladeStandAttackEvent attackEvent = new SlashBladeEvent.BladeStandAttackEvent(blade1, state, this.bladeStand,
                     this.level().damageSources().playerAttack(this.fakePlayer));
-                MinecraftForge.EVENT_BUS.post(attackEvent);
+                NeoForge.EVENT_BUS.post(attackEvent);
                 this.setItemInHand(InteractionHand.MAIN_HAND, attackEvent.getBlade());
             });
             copy1 = this.fakePlayer.getMainHandItem();
@@ -436,11 +439,11 @@ public class EntitySlashIllager extends AbstractIllager implements ISlashBladeEn
     }
     
     @Override
-    public double getMeleeAttackRangeSqr(LivingEntity entity) {
-        AtomicDouble attackDistance = new AtomicDouble(super.getMeleeAttackRangeSqr(entity));
-        this.getMainHandItem().getCapability(ItemSlashBlade.BLADESTATE).ifPresent(state ->
-            attackDistance.set(TargetSelector.getResolvedReach(this)));
-        return attackDistance.get() * attackDistance.get();
+    public boolean isWithinMeleeAttackRange(LivingEntity entity) {
+        return BladeStateAccess.of(this.getMainHandItem()).map(state -> {
+            double reach = TargetSelector.getResolvedReach(this);
+            return this.distanceTo(entity) < reach * reach;
+        }).orElse(false);
     }
     
     @Override
@@ -495,7 +498,7 @@ public class EntitySlashIllager extends AbstractIllager implements ISlashBladeEn
         
         targetList.removeIf(entity -> SlashBladeMobCompat.Factories.getSlashIllagerIgnores().stream().anyMatch(clazz -> clazz.isInstance(entity)));
         
-        attacker.getMainHandItem().getCapability(ItemSlashBlade.BLADESTATE).ifPresent(state -> {
+        BladeStateAccess.of(attacker.getMainHandItem()).ifPresent(state -> {
             Entity target = state.getTargetEntity(world);
             if (target != null) {
                 targetList.add(target);

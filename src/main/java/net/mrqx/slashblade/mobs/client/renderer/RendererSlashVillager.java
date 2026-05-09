@@ -24,8 +24,8 @@ public class RendererSlashVillager extends MobRenderer<EntitySlashVillager, Mode
     }
     
     @Override
-    protected void setupRotations(EntitySlashVillager entityLiving, PoseStack poseStack, float ageInTicks, float rotationYaw, float partialTicks) {
-        super.setupRotations(entityLiving, poseStack, ageInTicks, rotationYaw, partialTicks);
+    protected void setupRotations(EntitySlashVillager entityLiving, PoseStack poseStack, float ageInTicks, float rotationYaw, float partialTicks, float scale) {
+        super.setupRotations(entityLiving, poseStack, ageInTicks, rotationYaw, partialTicks, scale);
         VanillaConvertedVmdAnimation currentAnimation = entityLiving.getCurrentAnimation();
         if (currentAnimation != null) {
             currentAnimation.setTickDelta(partialTicks);

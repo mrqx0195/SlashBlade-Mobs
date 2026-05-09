@@ -5,15 +5,12 @@ import net.minecraft.client.model.geom.ModelLayers;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.HumanoidMobRenderer;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
 import net.mrqx.sbr_core.animation.VanillaConvertedVmdAnimation;
 import net.mrqx.sbr_core.client.layer.LayerSlashEntityArmor;
 import net.mrqx.sbr_core.client.layer.LayerSlashEntityBlade;
 import net.mrqx.slashblade.mobs.client.model.ModelSlashHumanoidMobs;
 import net.mrqx.slashblade.mobs.entity.EntitySlashSkeleton;
 
-@OnlyIn(Dist.CLIENT)
 public class RendererSlashSkeleton extends HumanoidMobRenderer<EntitySlashSkeleton, ModelSlashHumanoidMobs<EntitySlashSkeleton>> {
     private static final ResourceLocation SKELETON_LOCATION = ResourceLocation.parse("textures/entity/skeleton/skeleton.png");
     
@@ -27,8 +24,8 @@ public class RendererSlashSkeleton extends HumanoidMobRenderer<EntitySlashSkelet
     }
     
     @Override
-    protected void setupRotations(EntitySlashSkeleton entityLiving, PoseStack poseStack, float ageInTicks, float rotationYaw, float partialTicks) {
-        super.setupRotations(entityLiving, poseStack, ageInTicks, rotationYaw, partialTicks);
+    protected void setupRotations(EntitySlashSkeleton entityLiving, PoseStack poseStack, float ageInTicks, float rotationYaw, float partialTicks, float scale) {
+        super.setupRotations(entityLiving, poseStack, ageInTicks, rotationYaw, partialTicks, scale);
         VanillaConvertedVmdAnimation currentAnimation = entityLiving.getCurrentAnimation();
         if (currentAnimation != null) {
             currentAnimation.setTickDelta(partialTicks);

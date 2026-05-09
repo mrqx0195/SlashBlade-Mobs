@@ -6,8 +6,6 @@ import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.model.IllagerModel;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.world.entity.monster.AbstractIllager;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
 import net.mrqx.sbr_core.client.model.ISlashBladeEntityModel;
 import net.mrqx.sbr_core.client.utils.ModelUtils;
 import net.mrqx.sbr_core.entity.ISlashBladeEntity;
@@ -15,7 +13,6 @@ import net.mrqx.sbr_core.entity.ISlashBladeEntity;
 import java.util.HashMap;
 import java.util.Map;
 
-@OnlyIn(Dist.CLIENT)
 public class ModelSlashIllager<T extends AbstractIllager & ISlashBladeEntity> extends IllagerModel<T> implements ISlashBladeEntityModel {
     protected final ModelPart root;
     protected final Map<ModelPart, String> partMap;
@@ -65,19 +62,19 @@ public class ModelSlashIllager<T extends AbstractIllager & ISlashBladeEntity> ex
     }
     
     @Override
-    public void renderToBuffer(PoseStack poseStack, VertexConsumer buffer, int packedLight, int packedOverlay, float red, float green, float blue, float alpha) {
+    public void renderToBuffer(PoseStack poseStack, VertexConsumer buffer, int packedLight, int packedOverlay, int color) {
         ModelUtils.processSlashModel(poseStack, this, poseStack1 -> {
             if (this.young) {
                 ModelUtils.processYoungHumanoidModel(poseStack1,
                     poseStack2 -> this.headParts().forEach(modelPart ->
-                        modelPart.render(poseStack2, buffer, packedLight, packedOverlay, red, green, blue, alpha)),
+                        modelPart.render(poseStack2, buffer, packedLight, packedOverlay, color)),
                     poseStack2 -> this.bodyParts().forEach(modelPart ->
-                        modelPart.render(poseStack, buffer, packedLight, packedOverlay, red, green, blue, alpha)));
+                        modelPart.render(poseStack, buffer, packedLight, packedOverlay, color)));
             } else {
                 this.headParts().forEach(modelPart ->
-                    modelPart.render(poseStack, buffer, packedLight, packedOverlay, red, green, blue, alpha));
+                    modelPart.render(poseStack, buffer, packedLight, packedOverlay, color));
                 this.bodyParts().forEach(modelPart ->
-                    modelPart.render(poseStack, buffer, packedLight, packedOverlay, red, green, blue, alpha));
+                    modelPart.render(poseStack, buffer, packedLight, packedOverlay, color));
             }
         });
     }

@@ -3,11 +3,8 @@ package net.mrqx.slashblade.mobs.client.model;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.monster.Drowned;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
 import net.mrqx.sbr_core.entity.ISlashBladeEntity;
 
-@OnlyIn(Dist.CLIENT)
 public class ModelSlashDrowned<T extends Drowned & ISlashBladeEntity> extends ModelSlashHumanoidMobs<T> {
     public ModelSlashDrowned(ModelPart root) {
         super(root);

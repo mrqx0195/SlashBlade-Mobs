@@ -1,6 +1,7 @@
 package net.mrqx.slashblade.mobs.compat.guardvillagers;
 
-import tallestegg.guardvillagers.entities.Guard;
+
+import tallestegg.guardvillagers.common.entities.Guard;
 
 import java.util.ArrayList;
 import java.util.List;

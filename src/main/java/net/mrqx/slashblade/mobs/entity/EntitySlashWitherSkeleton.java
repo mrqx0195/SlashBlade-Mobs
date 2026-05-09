@@ -1,7 +1,7 @@
 package net.mrqx.slashblade.mobs.entity;
 
-import com.google.common.util.concurrent.AtomicDouble;
 import mods.flammpfeil.slashblade.SlashBlade;
+import mods.flammpfeil.slashblade.capability.slashblade.BladeStateAccess;
 import mods.flammpfeil.slashblade.data.builtin.SlashBladeBuiltInRegistry;
 import mods.flammpfeil.slashblade.item.ItemSlashBlade;
 import mods.flammpfeil.slashblade.registry.ComboStateRegistry;
@@ -30,7 +30,6 @@ import net.minecraft.world.entity.monster.piglin.AbstractPiglin;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.ServerLevelAccessor;
-import net.minecraftforge.common.ForgeMod;
 import net.mrqx.sbr_core.animation.VanillaConvertedVmdAnimation;
 import net.mrqx.sbr_core.entity.ISlashBladeEntity;
 import net.mrqx.sbr_core.entity.ai.goal.SimpleSlashGoal;
@@ -53,7 +52,8 @@ public class EntitySlashWitherSkeleton extends WitherSkeleton implements ISlashB
         return Monster.createMonsterAttributes()
             .add(Attributes.ATTACK_DAMAGE, 2.0)
             .add(Attributes.MOVEMENT_SPEED, 0.25)
-            .add(ForgeMod.ENTITY_REACH.get(), 5.0);
+            .add(Attributes.ENTITY_INTERACTION_RANGE, 5.0)
+            .add(Attributes.SWEEPING_DAMAGE_RATIO);
     }
     
     @Override
@@ -79,31 +79,30 @@ public class EntitySlashWitherSkeleton extends WitherSkeleton implements ISlashB
         int i = random.nextInt(20);
         Registry<SlashBladeDefinition> bladeRegistry = SlashBlade.getSlashBladeDefinitionRegistry(this.level());
         if (i < this.level().getDifficulty().getId()) {
-            this.setItemSlot(EquipmentSlot.MAINHAND, Objects.requireNonNull(bladeRegistry.get(SlashBladeBuiltInRegistry.SANGE.location())).getBlade());
+            this.setItemSlot(EquipmentSlot.MAINHAND, Objects.requireNonNull(bladeRegistry.get(SlashBladeBuiltInRegistry.SANGE.location())).getBlade(this.registryAccess()));
         } else {
             if (i < this.level().getDifficulty().getId() * 4) {
-                this.setItemSlot(EquipmentSlot.MAINHAND, Objects.requireNonNull(bladeRegistry.get(SlashBladeBuiltInRegistry.SABIGATANA.location())).getBlade());
+                this.setItemSlot(EquipmentSlot.MAINHAND, Objects.requireNonNull(bladeRegistry.get(SlashBladeBuiltInRegistry.SABIGATANA.location())).getBlade(this.registryAccess()));
             } else {
-                this.setItemSlot(EquipmentSlot.MAINHAND, Objects.requireNonNull(bladeRegistry.get(SlashBladeBuiltInRegistry.SABIGATANA_BROKEN.location())).getBlade());
+                this.setItemSlot(EquipmentSlot.MAINHAND, Objects.requireNonNull(bladeRegistry.get(SlashBladeBuiltInRegistry.SABIGATANA_BROKEN.location())).getBlade(this.registryAccess()));
             }
         }
     }
     
     @Override
-    public @Nullable SpawnGroupData finalizeSpawn(ServerLevelAccessor level, DifficultyInstance difficulty, MobSpawnType reason, @Nullable SpawnGroupData spawnData, @Nullable CompoundTag dataTag) {
-        SpawnGroupData spawnGroupData = super.finalizeSpawn(level, difficulty, reason, spawnData, dataTag);
+    public @Nullable SpawnGroupData finalizeSpawn(ServerLevelAccessor level, DifficultyInstance difficulty, MobSpawnType reason, @Nullable SpawnGroupData spawnData) {
+        SpawnGroupData spawnGroupData = super.finalizeSpawn(level, difficulty, reason, spawnData);
         Objects.requireNonNull(this.getAttribute(Attributes.ATTACK_DAMAGE)).setBaseValue(2.0);
         return spawnGroupData;
     }
     
     @Override
-    protected void populateDefaultEquipmentEnchantments(RandomSource random, DifficultyInstance difficulty) {
-        float f = difficulty.getSpecialMultiplier();
-        this.enchantSpawnedWeapon(random, f);
+    protected void populateDefaultEquipmentEnchantments(ServerLevelAccessor level, RandomSource random, DifficultyInstance difficulty) {
+        this.enchantSpawnedWeapon(level, random, difficulty);
         
         for (EquipmentSlot equipmentslot : EquipmentSlot.values()) {
-            if (equipmentslot.getType() == EquipmentSlot.Type.ARMOR) {
-                this.enchantSpawnedArmor(random, f, equipmentslot);
+            if (equipmentslot.getType() == EquipmentSlot.Type.HUMANOID_ARMOR) {
+                this.enchantSpawnedArmor(level, random, equipmentslot, difficulty);
             }
         }
     }
@@ -136,11 +135,11 @@ public class EntitySlashWitherSkeleton extends WitherSkeleton implements ISlashB
     }
     
     @Override
-    public double getMeleeAttackRangeSqr(LivingEntity entity) {
-        AtomicDouble attackDistance = new AtomicDouble(super.getMeleeAttackRangeSqr(entity));
-        this.getMainHandItem().getCapability(ItemSlashBlade.BLADESTATE).ifPresent(state ->
-            attackDistance.set(TargetSelector.getResolvedReach(this)));
-        return attackDistance.get() * attackDistance.get();
+    public boolean isWithinMeleeAttackRange(LivingEntity entity) {
+        return BladeStateAccess.of(this.getMainHandItem()).map(state -> {
+            double reach = TargetSelector.getResolvedReach(this);
+            return this.distanceTo(entity) < reach * reach;
+        }).orElse(false);
     }
     
     @Override

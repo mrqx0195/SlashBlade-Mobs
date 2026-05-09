@@ -1,7 +1,7 @@
 package net.mrqx.slashblade.mobs.entity;
 
-import com.google.common.util.concurrent.AtomicDouble;
 import mods.flammpfeil.slashblade.SlashBlade;
+import mods.flammpfeil.slashblade.capability.slashblade.BladeStateAccess;
 import mods.flammpfeil.slashblade.data.builtin.SlashBladeBuiltInRegistry;
 import mods.flammpfeil.slashblade.item.ItemSlashBlade;
 import mods.flammpfeil.slashblade.registry.ComboStateRegistry;
@@ -11,7 +11,6 @@ import mods.flammpfeil.slashblade.util.TargetSelector;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.BiomeTags;
 import net.minecraft.tags.FluidTags;
@@ -48,8 +47,8 @@ import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.ServerLevelAccessor;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.pathfinder.BlockPathTypes;
 import net.minecraft.world.level.pathfinder.Path;
+import net.minecraft.world.level.pathfinder.PathType;
 import net.minecraft.world.phys.Vec3;
 import net.mrqx.sbr_core.animation.VanillaConvertedVmdAnimation;
 import net.mrqx.sbr_core.entity.ISlashBladeEntity;
@@ -70,9 +69,8 @@ public class EntitySlashDrowned extends Drowned implements ISlashBladeEntity {
     public EntitySlashDrowned(EntityType<? extends Drowned> entityType, Level level) {
         super(entityType, level);
         this.xpReward *= 2;
-        this.setMaxUpStep(1.0F);
         this.moveControl = new DrownedMoveControl(this);
-        this.setPathfindingMalus(BlockPathTypes.WATER, 0.0F);
+        this.setPathfindingMalus(PathType.WATER, 0.0F);
         this.waterNavigation = new WaterBoundPathNavigation(this, level);
         this.groundNavigation = new GroundPathNavigation(this, level);
     }
@@ -105,7 +103,9 @@ public class EntitySlashDrowned extends Drowned implements ISlashBladeEntity {
             .add(Attributes.MOVEMENT_SPEED, 0.23)
             .add(Attributes.ATTACK_DAMAGE, 0.0)
             .add(Attributes.ARMOR, 2.0)
-            .add(Attributes.SPAWN_REINFORCEMENTS_CHANCE);
+            .add(Attributes.SPAWN_REINFORCEMENTS_CHANCE)
+            .add(Attributes.STEP_HEIGHT, 1.0)
+            .add(Attributes.SWEEPING_DAMAGE_RATIO);
     }
     
     public static boolean checkSlashDrownedSpawnRules(EntityType<EntitySlashDrowned> ignoredDrowned, ServerLevelAccessor serverLevel, MobSpawnType mobSpawnType, BlockPos pos, RandomSource random) {
@@ -133,8 +133,8 @@ public class EntitySlashDrowned extends Drowned implements ISlashBladeEntity {
     }
     
     @Override
-    public SpawnGroupData finalizeSpawn(ServerLevelAccessor level, DifficultyInstance difficulty, MobSpawnType reason, @Nullable SpawnGroupData spawnData, @Nullable CompoundTag dataTag) {
-        SpawnGroupData spawngroupdata = super.finalizeSpawn(level, difficulty, reason, spawnData, dataTag);
+    public SpawnGroupData finalizeSpawn(ServerLevelAccessor level, DifficultyInstance difficulty, MobSpawnType reason, @Nullable SpawnGroupData spawnData) {
+        SpawnGroupData spawngroupdata = super.finalizeSpawn(level, difficulty, reason, spawnData);
         if (this.getNavigation() instanceof GroundPathNavigation groundPathNavigation) {
             groundPathNavigation.setCanOpenDoors(true);
         }
@@ -151,7 +151,7 @@ public class EntitySlashDrowned extends Drowned implements ISlashBladeEntity {
         int i = random.nextInt(20);
         Registry<SlashBladeDefinition> bladeRegistry = SlashBlade.getSlashBladeDefinitionRegistry(this.level());
         if (i < this.level().getDifficulty().getId()) {
-            this.setItemSlot(EquipmentSlot.MAINHAND, Objects.requireNonNull(bladeRegistry.get(SlashBladeBuiltInRegistry.AGITO_RUST.location())).getBlade());
+            this.setItemSlot(EquipmentSlot.MAINHAND, Objects.requireNonNull(bladeRegistry.get(SlashBladeBuiltInRegistry.AGITO_RUST.location())).getBlade(this.registryAccess()));
         } else {
             if (i < this.level().getDifficulty().getId() * 4) {
                 this.setItemSlot(EquipmentSlot.MAINHAND, SlashBladeItems.SLASHBLADE_BAMBOO.get().getDefaultInstance());
@@ -179,11 +179,11 @@ public class EntitySlashDrowned extends Drowned implements ISlashBladeEntity {
     }
     
     @Override
-    public double getMeleeAttackRangeSqr(LivingEntity entity) {
-        AtomicDouble attackDistance = new AtomicDouble(super.getMeleeAttackRangeSqr(entity));
-        this.getMainHandItem().getCapability(ItemSlashBlade.BLADESTATE).ifPresent(state ->
-            attackDistance.set(TargetSelector.getResolvedReach(this)));
-        return attackDistance.get() * attackDistance.get();
+    public boolean isWithinMeleeAttackRange(LivingEntity entity) {
+        return BladeStateAccess.of(this.getMainHandItem()).map(state -> {
+            double reach = TargetSelector.getResolvedReach(this);
+            return this.distanceTo(entity) < reach * reach;
+        }).orElse(false);
     }
     
     @Override

@@ -3,22 +3,17 @@ package net.mrqx.slashblade.mobs.data;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.data.PackOutput;
-import net.minecraftforge.common.data.ExistingFileHelper;
-import net.minecraftforge.data.event.GatherDataEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
-import net.minecraftforge.fml.common.Mod.EventBusSubscriber.Bus;
 import net.mrqx.slashblade.mobs.SlashBladeMobs;
 import net.mrqx.slashblade.mobs.data.tag.EntityTypeTagProvider;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.neoforge.common.data.ExistingFileHelper;
+import net.neoforged.neoforge.data.event.GatherDataEvent;
 
 import java.util.concurrent.CompletableFuture;
 
-@EventBusSubscriber(bus = Bus.MOD)
+@EventBusSubscriber
 public class DataGen {
-    public DataGen() {
-        super();
-    }
-    
     @SubscribeEvent
     public static void dataGen(GatherDataEvent event) {
         DataGenerator dataGenerator = event.getGenerator();

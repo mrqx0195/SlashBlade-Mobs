@@ -3,6 +3,7 @@ package net.mrqx.slashblade.mobs.entity.villager;
 import com.mojang.datafixers.util.Pair;
 import mods.flammpfeil.slashblade.registry.ComboStateRegistry;
 import net.minecraft.data.models.blockstates.PropertyDispatch;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.npc.VillagerProfession;
@@ -33,7 +34,7 @@ public class SlashVillagerProfessionSettings {
     public final boolean canAirTrick;
     public final boolean canTrickDown;
     public final boolean canTrickDodge;
-    public final List<Pair<Enchantment, Integer>> defaultBladeEnchantments;
+    public final List<Pair<ResourceKey<Enchantment>, Integer>> defaultBladeEnchantments;
     @Nullable
     public final BiFunction<LivingEntity, ResourceLocation, Boolean> canUseComboFunction;
     @Nullable
@@ -44,7 +45,7 @@ public class SlashVillagerProfessionSettings {
                                            boolean canUseBaseSummonedSword, boolean canUseSpiralSword, boolean canUseStormSword,
                                            boolean canUseBlisteringSword, boolean canUseHeavyRainSword,
                                            boolean canAirTrick, boolean canTrickDown, boolean canTrickDodge,
-                                           List<Pair<Enchantment, Integer>> defaultBladeEnchantments,
+                                           List<Pair<ResourceKey<Enchantment>, Integer>> defaultBladeEnchantments,
                                            @Nullable BiFunction<LivingEntity, ResourceLocation, Boolean> canUseComboFunction,
                                            @Nullable PropertyDispatch.QuadFunction<LivingEntity, LivingEntity, ResourceLocation, ResourceLocation, Boolean> canProgressComboFunction) {
         this.canRapidSlash = canRapidSlash;
@@ -72,7 +73,7 @@ public class SlashVillagerProfessionSettings {
     }
     
     public SlashVillagerProfessionSettings withOverrides(Map<String, Boolean> overrideSettings,
-                                                         List<Pair<Enchantment, Integer>> defaultBladeEnchantments) {
+                                                         List<Pair<ResourceKey<Enchantment>, Integer>> defaultBladeEnchantments) {
         return withOverrides(overrideSettings, defaultBladeEnchantments, this.canUseComboFunction, this.canProgressComboFunction);
     }
     
@@ -82,7 +83,7 @@ public class SlashVillagerProfessionSettings {
     }
     
     public SlashVillagerProfessionSettings withOverrides(Map<String, Boolean> overrideSettings,
-                                                         List<Pair<Enchantment, Integer>> defaultBladeEnchantments,
+                                                         List<Pair<ResourceKey<Enchantment>, Integer>> defaultBladeEnchantments,
                                                          @Nullable BiFunction<LivingEntity, ResourceLocation, Boolean> canUseComboFunction) {
         return withOverrides(overrideSettings, defaultBladeEnchantments, canUseComboFunction, this.canProgressComboFunction);
     }
@@ -99,13 +100,13 @@ public class SlashVillagerProfessionSettings {
     }
     
     public SlashVillagerProfessionSettings withOverrides(Map<String, Boolean> overrideSettings,
-                                                         List<Pair<Enchantment, Integer>> defaultBladeEnchantments,
+                                                         List<Pair<ResourceKey<Enchantment>, Integer>> defaultBladeEnchantments,
                                                          @Nullable PropertyDispatch.QuadFunction<LivingEntity, LivingEntity, ResourceLocation, ResourceLocation, Boolean> canProgressComboFunction) {
         return withOverrides(overrideSettings, defaultBladeEnchantments, this.canUseComboFunction, canProgressComboFunction);
     }
     
     public SlashVillagerProfessionSettings withOverrides(Map<String, Boolean> overrideSettings,
-                                                         List<Pair<Enchantment, Integer>> defaultBladeEnchantments,
+                                                         List<Pair<ResourceKey<Enchantment>, Integer>> defaultBladeEnchantments,
                                                          @Nullable BiFunction<LivingEntity, ResourceLocation, Boolean> canUseComboFunction,
                                                          @Nullable PropertyDispatch.QuadFunction<LivingEntity, LivingEntity, ResourceLocation, ResourceLocation, Boolean> canProgressComboFunction) {
         return new SlashVillagerProfessionSettings(
@@ -156,7 +157,7 @@ public class SlashVillagerProfessionSettings {
         A_2.withOverrides(Map.of(
             "canRapidSlash", true,
             "canUseBaseSummonedSword", true
-        ), List.of(new Pair<>(Enchantments.POWER_ARROWS, 1)))
+        ), List.of(new Pair<>(Enchantments.POWER, 1)))
     );
     
     public static final SlashVillagerProfessionSettings A_4 = registerSettings(SlashMobsVillagerProfessions.SLASHBLADE_SAMURAI_A.get(), 4,
@@ -201,7 +202,7 @@ public class SlashVillagerProfessionSettings {
     public static final SlashVillagerProfessionSettings B_2 = registerSettings(SlashMobsVillagerProfessions.SLASHBLADE_SAMURAI_B.get(), 2,
         B_1.withOverrides(Map.of(
                 "canUseBaseSummonedSword", true
-            ), List.of(new Pair<>(Enchantments.POWER_ARROWS, 3)),
+            ), List.of(new Pair<>(Enchantments.POWER, 3)),
             (villager, combo) -> {
                 if (!combo.equals(ComboStateRegistry.COMBO_C.getId()) &&
                     !combo.equals(ComboStateRegistry.COMBO_A4.getId()) &&
@@ -245,7 +246,7 @@ public class SlashVillagerProfessionSettings {
         B_4.withOverrides(Map.of(
             "powerful", true,
             "canAirTrick", true
-        ), List.of(new Pair<>(Enchantments.POWER_ARROWS, 5)))
+        ), List.of(new Pair<>(Enchantments.POWER, 5)))
     );
     
     public static final SlashVillagerProfessionSettings C_1 = registerSettings(SlashMobsVillagerProfessions.SLASHBLADE_SAMURAI_C.get(), 1,
@@ -267,7 +268,7 @@ public class SlashVillagerProfessionSettings {
     public static final SlashVillagerProfessionSettings C_3 = registerSettings(SlashMobsVillagerProfessions.SLASHBLADE_SAMURAI_C.get(), 3,
         C_2.withOverrides(Map.of(
                 "canUseBaseSummonedSword", true
-            ), List.of(new Pair<>(Enchantments.POWER_ARROWS, 1)),
+            ), List.of(new Pair<>(Enchantments.POWER, 1)),
             (villager, combo) -> !combo.equals(ComboStateRegistry.COMBO_A3.getId()) &&
                 !combo.equals(ComboStateRegistry.COMBO_B1.getId()) &&
                 !combo.equals(ComboStateRegistry.AERIAL_RAVE_A3.getId()))

@@ -1,19 +1,20 @@
 package net.mrqx.slashblade.mobs.utils;
 
-import mods.flammpfeil.slashblade.item.ItemSlashBlade;
+import mods.flammpfeil.slashblade.capability.slashblade.BladeStateAccess;
 import mods.flammpfeil.slashblade.item.SwordType;
+import net.minecraft.core.Holder;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
+import net.minecraft.world.item.enchantment.ItemEnchantments;
 import net.mrqx.slashblade.mobs.entity.villager.SlashVillagerProfessionSettings;
-
-import java.util.Map;
 
 public class SlashMobsUtils {
     public static void restoreBladeData(ItemStack newBlade, ItemStack oldBlade) {
-        newBlade.getCapability(ItemSlashBlade.BLADESTATE).ifPresent(newState ->
-            oldBlade.getCapability(ItemSlashBlade.BLADESTATE).ifPresent(oldState -> {
+        BladeStateAccess.of(newBlade).ifPresent(newState ->
+            BladeStateAccess.of(oldBlade).ifPresent(oldState -> {
                 CompoundTag oldTag = oldState.serializeNBT();
                 oldTag.putString("translationKey", newState.getTranslationKey());
                 newState.getTexture().ifPresent((loc) -> oldTag.putString("TextureName", loc.toString()));
@@ -51,18 +52,19 @@ public class SlashMobsUtils {
         );
     }
     
-    public static void setNewBladeEnchantments(ItemStack oldBlade, SlashVillagerProfessionSettings professionSettings, ItemStack newBlade) {
-        Map<Enchantment, Integer> allEnchantments = oldBlade.getAllEnchantments();
+    public static void setNewBladeEnchantments(ItemStack oldBlade, SlashVillagerProfessionSettings professionSettings, ItemStack newBlade, HolderLookup.RegistryLookup<Enchantment> lookup) {
+        ItemEnchantments.Mutable allEnchantments = new ItemEnchantments.Mutable(oldBlade.getAllEnchantments(lookup));
         professionSettings.defaultBladeEnchantments.forEach(enchantmentIntegerEntry -> {
-            Integer i = allEnchantments.get(enchantmentIntegerEntry.getFirst());
-            if (i != null) {
+            Holder.Reference<Enchantment> holder = lookup.getOrThrow(enchantmentIntegerEntry.getFirst());
+            int i = allEnchantments.getLevel(holder);
+            if (i != 0) {
                 if (i < enchantmentIntegerEntry.getSecond()) {
-                    allEnchantments.put(enchantmentIntegerEntry.getFirst(), enchantmentIntegerEntry.getSecond());
+                    allEnchantments.set(holder, enchantmentIntegerEntry.getSecond());
                 }
             } else {
-                allEnchantments.put(enchantmentIntegerEntry.getFirst(), enchantmentIntegerEntry.getSecond());
+                allEnchantments.set(holder, enchantmentIntegerEntry.getSecond());
             }
         });
-        EnchantmentHelper.setEnchantments(allEnchantments, newBlade);
+        EnchantmentHelper.setEnchantments(newBlade, allEnchantments.toImmutable());
     }
 }

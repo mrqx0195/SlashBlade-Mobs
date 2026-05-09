@@ -7,8 +7,6 @@ import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.HumanoidMobRenderer;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
 import net.mrqx.sbr_core.animation.VanillaConvertedVmdAnimation;
 import net.mrqx.sbr_core.client.layer.LayerSlashEntityArmor;
 import net.mrqx.sbr_core.client.layer.LayerSlashEntityBlade;
@@ -16,7 +14,6 @@ import net.mrqx.slashblade.mobs.client.layer.LayerSlashDrownedOuter;
 import net.mrqx.slashblade.mobs.client.model.ModelSlashDrowned;
 import net.mrqx.slashblade.mobs.entity.EntitySlashDrowned;
 
-@OnlyIn(Dist.CLIENT)
 public class RendererSlashDrowned extends HumanoidMobRenderer<EntitySlashDrowned, ModelSlashDrowned<EntitySlashDrowned>> {
     private static final ResourceLocation DROWNED_LOCATION = ResourceLocation.parse("textures/entity/zombie/drowned.png");
     
@@ -31,8 +28,8 @@ public class RendererSlashDrowned extends HumanoidMobRenderer<EntitySlashDrowned
     }
     
     @Override
-    protected void setupRotations(EntitySlashDrowned entityLiving, PoseStack poseStack, float ageInTicks, float rotationYaw, float partialTicks) {
-        super.setupRotations(entityLiving, poseStack, ageInTicks, rotationYaw, partialTicks);
+    protected void setupRotations(EntitySlashDrowned entityLiving, PoseStack poseStack, float ageInTicks, float rotationYaw, float partialTicks, float scale) {
+        super.setupRotations(entityLiving, poseStack, ageInTicks, rotationYaw, partialTicks, scale);
         VanillaConvertedVmdAnimation currentAnimation = entityLiving.getCurrentAnimation();
         if (currentAnimation != null) {
             currentAnimation.setTickDelta(partialTicks);

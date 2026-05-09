@@ -1,7 +1,7 @@
 package net.mrqx.slashblade.mobs.entity;
 
-import com.google.common.util.concurrent.AtomicDouble;
 import mods.flammpfeil.slashblade.SlashBlade;
+import mods.flammpfeil.slashblade.capability.slashblade.BladeStateAccess;
 import mods.flammpfeil.slashblade.data.builtin.SlashBladeBuiltInRegistry;
 import mods.flammpfeil.slashblade.item.ItemSlashBlade;
 import mods.flammpfeil.slashblade.registry.ComboStateRegistry;
@@ -10,7 +10,6 @@ import mods.flammpfeil.slashblade.registry.slashblade.SlashBladeDefinition;
 import mods.flammpfeil.slashblade.util.TargetSelector;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Registry;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.DifficultyInstance;
@@ -60,7 +59,8 @@ public class EntitySlashHusk extends Husk implements ISlashBladeEntity {
             .add(Attributes.MOVEMENT_SPEED, 0.3)
             .add(Attributes.ATTACK_DAMAGE, 0.0)
             .add(Attributes.ARMOR, 2.0)
-            .add(Attributes.SPAWN_REINFORCEMENTS_CHANCE);
+            .add(Attributes.SPAWN_REINFORCEMENTS_CHANCE)
+            .add(Attributes.SWEEPING_DAMAGE_RATIO);
     }
     
     @Override
@@ -70,8 +70,8 @@ public class EntitySlashHusk extends Husk implements ISlashBladeEntity {
     
     @Override
     @Nullable
-    public SpawnGroupData finalizeSpawn(ServerLevelAccessor level, DifficultyInstance difficulty, MobSpawnType reason, @Nullable SpawnGroupData spawnData, @Nullable CompoundTag dataTag) {
-        SpawnGroupData spawngroupdata = super.finalizeSpawn(level, difficulty, reason, spawnData, dataTag);
+    public SpawnGroupData finalizeSpawn(ServerLevelAccessor level, DifficultyInstance difficulty, MobSpawnType reason, @Nullable SpawnGroupData spawnData) {
+        SpawnGroupData spawngroupdata = super.finalizeSpawn(level, difficulty, reason, spawnData);
         if (this.getNavigation() instanceof GroundPathNavigation groundPathNavigation) {
             groundPathNavigation.setCanOpenDoors(true);
         }
@@ -84,7 +84,7 @@ public class EntitySlashHusk extends Husk implements ISlashBladeEntity {
         int i = random.nextInt(20);
         Registry<SlashBladeDefinition> bladeRegistry = SlashBlade.getSlashBladeDefinitionRegistry(this.level());
         if (i < this.level().getDifficulty().getId()) {
-            this.setItemSlot(EquipmentSlot.MAINHAND, Objects.requireNonNull(bladeRegistry.get(SlashBladeBuiltInRegistry.RUBY.location())).getBlade());
+            this.setItemSlot(EquipmentSlot.MAINHAND, Objects.requireNonNull(bladeRegistry.get(SlashBladeBuiltInRegistry.RUBY.location())).getBlade(this.registryAccess()));
         } else {
             if (i < this.level().getDifficulty().getId() * 4) {
                 this.setItemSlot(EquipmentSlot.MAINHAND, SlashBladeItems.SLASHBLADE_WHITE.get().getDefaultInstance());
@@ -125,11 +125,11 @@ public class EntitySlashHusk extends Husk implements ISlashBladeEntity {
     }
     
     @Override
-    public double getMeleeAttackRangeSqr(LivingEntity entity) {
-        AtomicDouble attackDistance = new AtomicDouble(super.getMeleeAttackRangeSqr(entity));
-        this.getMainHandItem().getCapability(ItemSlashBlade.BLADESTATE).ifPresent(state ->
-            attackDistance.set(TargetSelector.getResolvedReach(this)));
-        return attackDistance.get() * attackDistance.get();
+    public boolean isWithinMeleeAttackRange(LivingEntity entity) {
+        return BladeStateAccess.of(this.getMainHandItem()).map(state -> {
+            double reach = TargetSelector.getResolvedReach(this);
+            return this.distanceTo(entity) < reach * reach;
+        }).orElse(false);
     }
     
     @Override

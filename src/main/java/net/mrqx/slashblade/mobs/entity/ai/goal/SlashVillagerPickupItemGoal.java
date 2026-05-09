@@ -23,7 +23,7 @@ public class SlashVillagerPickupItemGoal extends Goal {
         if (items.isEmpty()) {
             return false;
         }
-        this.targetItem = items.get(0);
+        this.targetItem = items.getFirst();
         return true;
     }
     
