@@ -1,0 +1,13 @@
+{
+  "entries": [
+    {
+      "enum": "net/minecraft/world/entity/raid/Raid$RaiderType",
+      "name": "SLASHBLADE_MOBS_SLASH_ILLAGER",
+      "constructor": "(Ljava/util/function/Supplier;[I)V",
+      "parameters": {
+        "class": "net/mrqx/slashblade/mobs/SlashBladeMobsEnumProxies",
+        "field": "SLASH_ILLAGER_RAIDER_TYPE_ENUM_PROXY"
+      }
+    }
+  ]
+}
