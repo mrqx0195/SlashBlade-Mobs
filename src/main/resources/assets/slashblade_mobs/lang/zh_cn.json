@@ -1,18 +1,21 @@
 {
+  "entity.minecraft.villager.slashblade_mobs.slashblade_samurai_a": "审判武士",
+  "entity.minecraft.villager.slashblade_mobs.slashblade_samurai_b": "幻影武士",
+  "entity.minecraft.villager.slashblade_mobs.slashblade_samurai_c": "制空武士",
   "entity.slashblade_mobs.slash_drowned": "溺尸武者",
   "entity.slashblade_mobs.slash_husk": "尸壳武者",
+  "entity.slashblade_mobs.slash_illager": "劫掠武士",
   "entity.slashblade_mobs.slash_skeleton": "骨武者",
   "entity.slashblade_mobs.slash_stray": "流浪骨武者",
   "entity.slashblade_mobs.slash_villager": "村民武士",
-  "entity.slashblade_mobs.slash_illager": "劫掠武士",
   "entity.slashblade_mobs.slash_wither_skeleton": "凋灵骨武者",
   "entity.slashblade_mobs.slash_zombie": "尸武者",
   "item.slashblade_mobs.slash_drowned_spawn_egg": "溺尸武者刷怪蛋",
   "item.slashblade_mobs.slash_husk_spawn_egg": "尸壳武者刷怪蛋",
+  "item.slashblade_mobs.slash_illager_spawn_egg": "劫掠武士刷怪蛋",
   "item.slashblade_mobs.slash_skeleton_spawn_egg": "骨武者刷怪蛋",
   "item.slashblade_mobs.slash_stray_spawn_egg": "流浪骨武者刷怪蛋",
   "item.slashblade_mobs.slash_villager_spawn_egg": "村民武士刷怪蛋",
-  "item.slashblade_mobs.slash_illager_spawn_egg": "劫掠武士刷怪蛋",
   "item.slashblade_mobs.slash_wither_skeleton_spawn_egg": "凋灵骨武者刷怪蛋",
   "item.slashblade_mobs.slash_zombie_spawn_egg": "尸武者刷怪蛋"
 }
