@@ -35,6 +35,7 @@ import net.mrqx.sbr_core.animation.VanillaConvertedVmdAnimation;
 import net.mrqx.sbr_core.entity.ISlashBladeEntity;
 import net.mrqx.sbr_core.entity.ai.goal.SimpleSlashGoal;
 import net.mrqx.slashblade.mobs.registy.SlashMobsEntities;
+import net.neoforged.neoforge.event.EventHooks;
 
 import javax.annotation.Nullable;
 import java.util.Objects;
@@ -108,6 +109,9 @@ public class EntitySlashZombie extends Zombie implements ISlashBladeEntity {
     
     @Override
     protected void doUnderWaterConversion() {
+        if (!EventHooks.canLivingConvert(this, EntityType.DROWNED, (timer) -> this.conversionTime = timer)) {
+            return;
+        }
         this.convertToZombieType(SlashMobsEntities.SLASH_DROWNED.get());
         if (!this.isSilent()) {
             this.level().levelEvent(null, 1040, this.blockPosition(), 0);

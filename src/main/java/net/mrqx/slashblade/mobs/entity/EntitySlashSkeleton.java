@@ -20,12 +20,15 @@ import net.minecraft.world.entity.animal.Turtle;
 import net.minecraft.world.entity.animal.Wolf;
 import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.entity.monster.Skeleton;
+import net.minecraft.world.entity.monster.Stray;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.mrqx.sbr_core.animation.VanillaConvertedVmdAnimation;
 import net.mrqx.sbr_core.entity.ISlashBladeEntity;
 import net.mrqx.sbr_core.entity.ai.goal.SimpleSlashGoal;
+import net.mrqx.slashblade.mobs.mixin.AccessorSkeleton;
 import net.mrqx.slashblade.mobs.registy.SlashMobsEntities;
+import net.neoforged.neoforge.event.EventHooks;
 
 import javax.annotation.Nullable;
 import java.util.Set;
@@ -104,7 +107,13 @@ public class EntitySlashSkeleton extends Skeleton implements ISlashBladeEntity {
     
     @Override
     protected void doFreezeConversion() {
-        this.convertTo(SlashMobsEntities.SLASH_STRAY.get(), true);
+        if (!EventHooks.canLivingConvert(this, EntityType.STRAY, ((AccessorSkeleton) this)::setConversionTime)) {
+            return;
+        }
+        Stray stray = this.convertTo(SlashMobsEntities.SLASH_STRAY.get(), true);
+        if (stray != null) {
+            EventHooks.onLivingConvert(this, stray);
+        }
         if (!this.isSilent()) {
             this.level().levelEvent(null, 1048, this.blockPosition(), 0);
         }
